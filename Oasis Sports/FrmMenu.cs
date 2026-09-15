@@ -201,7 +201,7 @@ namespace Oasis_Sports
 
         private void gESTIONDEIDIOMASToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private BLL_Permisos permisoBLL = new BLL_Permisos();
@@ -225,6 +225,20 @@ namespace Oasis_Sports
         {
             FrmIdiomas frmIdiomas = new FrmIdiomas();
             frmIdiomas.Show();
+            this.Hide();
+        }
+
+        private void eQUIPOSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmEquipos frmEquipos = new FrmEquipos();
+            frmEquipos.Show();
+            this.Hide();
+        }
+
+        private void jUGADORESToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmJugadores frmJugadores = new FrmJugadores();
+            frmJugadores.Show();
             this.Hide();
         }
     }

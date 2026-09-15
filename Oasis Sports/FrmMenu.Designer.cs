@@ -25,6 +25,9 @@ namespace Oasis_Sports
             gESTIONDEUSUARIOSToolStripMenuItem = new ToolStripMenuItem();
             gESTIONDEPERFILESToolStripMenuItem = new ToolStripMenuItem();
             bITACORADECAMBIOSToolStripMenuItem = new ToolStripMenuItem();
+            mAESTROSToolStripMenuItem = new ToolStripMenuItem();
+            eQUIPOSToolStripMenuItem = new ToolStripMenuItem();
+            jUGADORESToolStripMenuItem = new ToolStripMenuItem();
             gESTIONDERESERVASToolStripMenuItem = new ToolStripMenuItem();
             gESTIONDEIDIOMASToolStripMenuItem = new ToolStripMenuItem();
             sELECCIONARIDIOMAToolStripMenuItem = new ToolStripMenuItem();
@@ -35,7 +38,7 @@ namespace Oasis_Sports
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { uSUARIOToolStripMenuItem, bitacoraToolStripMenuItem, gESTIONDERESERVASToolStripMenuItem, gESTIONDEIDIOMASToolStripMenuItem, sALIRToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { uSUARIOToolStripMenuItem, bitacoraToolStripMenuItem, mAESTROSToolStripMenuItem, gESTIONDERESERVASToolStripMenuItem, gESTIONDEIDIOMASToolStripMenuItem, sALIRToolStripMenuItem });
             menuStrip1.Location = new Point(2, 2);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(796, 24);
@@ -103,12 +106,34 @@ namespace Oasis_Sports
             bITACORADECAMBIOSToolStripMenuItem.Text = "BITACORA DE CAMBIOS";
             bITACORADECAMBIOSToolStripMenuItem.Click += bITACORADECAMBIOSToolStripMenuItem_Click;
             // 
+            // mAESTROSToolStripMenuItem
+            // 
+            mAESTROSToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { eQUIPOSToolStripMenuItem, jUGADORESToolStripMenuItem });
+            mAESTROSToolStripMenuItem.Font = new Font("Times New Roman", 9.75F);
+            mAESTROSToolStripMenuItem.Name = "mAESTROSToolStripMenuItem";
+            mAESTROSToolStripMenuItem.Size = new Size(87, 20);
+            mAESTROSToolStripMenuItem.Text = "MAESTROS";
+            // 
+            // eQUIPOSToolStripMenuItem
+            // 
+            eQUIPOSToolStripMenuItem.Name = "eQUIPOSToolStripMenuItem";
+            eQUIPOSToolStripMenuItem.Size = new Size(180, 22);
+            eQUIPOSToolStripMenuItem.Text = "EQUIPOS";
+            eQUIPOSToolStripMenuItem.Click += eQUIPOSToolStripMenuItem_Click;
+            // 
+            // jUGADORESToolStripMenuItem
+            // 
+            jUGADORESToolStripMenuItem.Name = "jUGADORESToolStripMenuItem";
+            jUGADORESToolStripMenuItem.Size = new Size(180, 22);
+            jUGADORESToolStripMenuItem.Text = "JUGADORES";
+            jUGADORESToolStripMenuItem.Click += jUGADORESToolStripMenuItem_Click;
+            // 
             // gESTIONDERESERVASToolStripMenuItem
             // 
             gESTIONDERESERVASToolStripMenuItem.Font = new Font("Times New Roman", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             gESTIONDERESERVASToolStripMenuItem.Name = "gESTIONDERESERVASToolStripMenuItem";
             gESTIONDERESERVASToolStripMenuItem.Size = new Size(149, 20);
-            gESTIONDERESERVASToolStripMenuItem.Text = "GESTION DE RESERVAS";
+            gESTIONDERESERVASToolStripMenuItem.Text = "GESTION DE TORNEOS";
             gESTIONDERESERVASToolStripMenuItem.Visible = false;
             // 
             // gESTIONDEIDIOMASToolStripMenuItem
@@ -180,5 +205,8 @@ namespace Oasis_Sports
         private ToolStripMenuItem bITACORADECAMBIOSToolStripMenuItem;
         private ToolStripMenuItem sELECCIONARIDIOMAToolStripMenuItem;
         private ToolStripMenuItem cREARIDIOMAToolStripMenuItem;
+        private ToolStripMenuItem mAESTROSToolStripMenuItem;
+        private ToolStripMenuItem eQUIPOSToolStripMenuItem;
+        private ToolStripMenuItem jUGADORESToolStripMenuItem;
     }
 }
