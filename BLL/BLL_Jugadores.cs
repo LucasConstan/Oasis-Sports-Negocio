@@ -13,6 +13,8 @@ namespace BLL
         DAL_Jugador dalJugador_348LC = new DAL_Jugador();
         DAL_Equipo dalEquipo_348LC = new DAL_Equipo();
 
+        public const int SIN_EQUIPO_ID = 0;
+
         public List<Jugador> Listar_348LC()
         {
             return dalJugador_348LC.Listar_348LC();
@@ -63,5 +65,12 @@ namespace BLL
             if (dalEquipo_348LC.ObtenerPorId_348LC(jugador_348LC.IdEquipo) == null)
                 throw new Exception("El equipo indicado no existe.");
         }
+
+        public List<Jugador> ListarPorEquipo_348LC(int idEquipo_348LC)
+        {
+            return dalJugador_348LC.ListarPorEquipo_348LC(idEquipo_348LC);
+        }
     }
+
+
 }

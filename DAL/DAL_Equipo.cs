@@ -18,7 +18,7 @@ namespace DAL
             SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
             cn_348LC.Open();
 
-            string query_348LC = "select Id_Equipo, NombreEquipo, NombreResponsable, ColorPrincipal, ColorSecundario, Eliminado from Equipos where Eliminado = 0";
+            string query_348LC = "select Id_Equipo, NombreEquipo, NombreResponsable, ColorPrincipal, ColorSecundario, Eliminado from Equipos where Eliminado = 0 and Id_Equipo <> 0";
 
             SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC);
             try

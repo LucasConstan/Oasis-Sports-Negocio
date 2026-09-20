@@ -17,5 +17,6 @@ namespace Entidades
         public int Numero { get; set; }
         public int IdEquipo { get; set; }
         public bool Eliminado { get; set; }
+        public string NombreEquipo { get; set; }
     }
 }

@@ -40,6 +40,7 @@ namespace Oasis_Sports
         {
             dgvJugadores.DataSource = bllJugador_348LC.Listar_348LC();
             dgvJugadores.Columns["Eliminado"].Visible = false;
+            dgvJugadores.Columns["IdEquipo"].Visible = false;
         }
 
         private void dgvJugadores_SelectionChanged(object sender, EventArgs e)

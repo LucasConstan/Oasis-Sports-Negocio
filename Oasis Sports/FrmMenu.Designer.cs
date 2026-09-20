@@ -29,6 +29,8 @@ namespace Oasis_Sports
             eQUIPOSToolStripMenuItem = new ToolStripMenuItem();
             jUGADORESToolStripMenuItem = new ToolStripMenuItem();
             gESTIONDERESERVASToolStripMenuItem = new ToolStripMenuItem();
+            tORNEOSToolStripMenuItem = new ToolStripMenuItem();
+            aSIGNAREQUIPOSToolStripMenuItem = new ToolStripMenuItem();
             gESTIONDEIDIOMASToolStripMenuItem = new ToolStripMenuItem();
             sELECCIONARIDIOMAToolStripMenuItem = new ToolStripMenuItem();
             cREARIDIOMAToolStripMenuItem = new ToolStripMenuItem();
@@ -117,24 +119,40 @@ namespace Oasis_Sports
             // eQUIPOSToolStripMenuItem
             // 
             eQUIPOSToolStripMenuItem.Name = "eQUIPOSToolStripMenuItem";
-            eQUIPOSToolStripMenuItem.Size = new Size(180, 22);
+            eQUIPOSToolStripMenuItem.Size = new Size(146, 22);
             eQUIPOSToolStripMenuItem.Text = "EQUIPOS";
             eQUIPOSToolStripMenuItem.Click += eQUIPOSToolStripMenuItem_Click;
             // 
             // jUGADORESToolStripMenuItem
             // 
             jUGADORESToolStripMenuItem.Name = "jUGADORESToolStripMenuItem";
-            jUGADORESToolStripMenuItem.Size = new Size(180, 22);
+            jUGADORESToolStripMenuItem.Size = new Size(146, 22);
             jUGADORESToolStripMenuItem.Text = "JUGADORES";
             jUGADORESToolStripMenuItem.Click += jUGADORESToolStripMenuItem_Click;
             // 
             // gESTIONDERESERVASToolStripMenuItem
             // 
+            gESTIONDERESERVASToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tORNEOSToolStripMenuItem, aSIGNAREQUIPOSToolStripMenuItem });
             gESTIONDERESERVASToolStripMenuItem.Font = new Font("Times New Roman", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             gESTIONDERESERVASToolStripMenuItem.Name = "gESTIONDERESERVASToolStripMenuItem";
             gESTIONDERESERVASToolStripMenuItem.Size = new Size(149, 20);
             gESTIONDERESERVASToolStripMenuItem.Text = "GESTION DE TORNEOS";
             gESTIONDERESERVASToolStripMenuItem.Visible = false;
+            gESTIONDERESERVASToolStripMenuItem.Click += gESTIONDERESERVASToolStripMenuItem_Click;
+            // 
+            // tORNEOSToolStripMenuItem
+            // 
+            tORNEOSToolStripMenuItem.Name = "tORNEOSToolStripMenuItem";
+            tORNEOSToolStripMenuItem.Size = new Size(182, 22);
+            tORNEOSToolStripMenuItem.Text = "TORNEOS";
+            tORNEOSToolStripMenuItem.Click += tORNEOSToolStripMenuItem_Click;
+            // 
+            // aSIGNAREQUIPOSToolStripMenuItem
+            // 
+            aSIGNAREQUIPOSToolStripMenuItem.Name = "aSIGNAREQUIPOSToolStripMenuItem";
+            aSIGNAREQUIPOSToolStripMenuItem.Size = new Size(182, 22);
+            aSIGNAREQUIPOSToolStripMenuItem.Text = "ASIGNAR EQUIPOS";
+            aSIGNAREQUIPOSToolStripMenuItem.Click += aSIGNAREQUIPOSToolStripMenuItem_Click;
             // 
             // gESTIONDEIDIOMASToolStripMenuItem
             // 
@@ -208,5 +226,7 @@ namespace Oasis_Sports
         private ToolStripMenuItem mAESTROSToolStripMenuItem;
         private ToolStripMenuItem eQUIPOSToolStripMenuItem;
         private ToolStripMenuItem jUGADORESToolStripMenuItem;
+        private ToolStripMenuItem tORNEOSToolStripMenuItem;
+        private ToolStripMenuItem aSIGNAREQUIPOSToolStripMenuItem;
     }
 }

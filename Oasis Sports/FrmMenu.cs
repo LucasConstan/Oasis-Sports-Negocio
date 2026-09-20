@@ -241,5 +241,26 @@ namespace Oasis_Sports
             frmJugadores.Show();
             this.Hide();
         }
+
+        private void gESTIONDERESERVASToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tORNEOSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmTorneo frmTorneo = new FrmTorneo();
+            frmTorneo.Show();
+            this.Close();
+        }
+
+        private void aSIGNAREQUIPOSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmInscripcion frmInscripcion = new FrmInscripcion();
+            frmInscripcion.Show();
+            this.Close();
+        }
+
+
     }
 }
