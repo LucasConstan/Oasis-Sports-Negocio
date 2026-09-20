@@ -261,6 +261,18 @@ namespace Oasis_Sports
             this.Close();
         }
 
+        private void oRGANIZARPARTIDOSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmOrganizarPartidos frmOrganizarPartidos = new FrmOrganizarPartidos();
+            frmOrganizarPartidos.Show();
+            this.Close();
+        }
 
+        private void rEGISTRARRESULTADOSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmRegistrarResultado frmRegistrarResultado = new FrmRegistrarResultado();
+            frmRegistrarResultado.Show();
+            this.Close();
+        }
     }
 }

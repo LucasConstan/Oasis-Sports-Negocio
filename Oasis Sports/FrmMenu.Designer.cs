@@ -31,10 +31,12 @@ namespace Oasis_Sports
             gESTIONDERESERVASToolStripMenuItem = new ToolStripMenuItem();
             tORNEOSToolStripMenuItem = new ToolStripMenuItem();
             aSIGNAREQUIPOSToolStripMenuItem = new ToolStripMenuItem();
+            oRGANIZARPARTIDOSToolStripMenuItem = new ToolStripMenuItem();
             gESTIONDEIDIOMASToolStripMenuItem = new ToolStripMenuItem();
             sELECCIONARIDIOMAToolStripMenuItem = new ToolStripMenuItem();
             cREARIDIOMAToolStripMenuItem = new ToolStripMenuItem();
             sALIRToolStripMenuItem = new ToolStripMenuItem();
+            rEGISTRARRESULTADOSToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -132,7 +134,7 @@ namespace Oasis_Sports
             // 
             // gESTIONDERESERVASToolStripMenuItem
             // 
-            gESTIONDERESERVASToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tORNEOSToolStripMenuItem, aSIGNAREQUIPOSToolStripMenuItem });
+            gESTIONDERESERVASToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { tORNEOSToolStripMenuItem, aSIGNAREQUIPOSToolStripMenuItem, oRGANIZARPARTIDOSToolStripMenuItem, rEGISTRARRESULTADOSToolStripMenuItem });
             gESTIONDERESERVASToolStripMenuItem.Font = new Font("Times New Roman", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             gESTIONDERESERVASToolStripMenuItem.Name = "gESTIONDERESERVASToolStripMenuItem";
             gESTIONDERESERVASToolStripMenuItem.Size = new Size(149, 20);
@@ -143,16 +145,23 @@ namespace Oasis_Sports
             // tORNEOSToolStripMenuItem
             // 
             tORNEOSToolStripMenuItem.Name = "tORNEOSToolStripMenuItem";
-            tORNEOSToolStripMenuItem.Size = new Size(182, 22);
+            tORNEOSToolStripMenuItem.Size = new Size(220, 22);
             tORNEOSToolStripMenuItem.Text = "TORNEOS";
             tORNEOSToolStripMenuItem.Click += tORNEOSToolStripMenuItem_Click;
             // 
             // aSIGNAREQUIPOSToolStripMenuItem
             // 
             aSIGNAREQUIPOSToolStripMenuItem.Name = "aSIGNAREQUIPOSToolStripMenuItem";
-            aSIGNAREQUIPOSToolStripMenuItem.Size = new Size(182, 22);
+            aSIGNAREQUIPOSToolStripMenuItem.Size = new Size(220, 22);
             aSIGNAREQUIPOSToolStripMenuItem.Text = "ASIGNAR EQUIPOS";
             aSIGNAREQUIPOSToolStripMenuItem.Click += aSIGNAREQUIPOSToolStripMenuItem_Click;
+            // 
+            // oRGANIZARPARTIDOSToolStripMenuItem
+            // 
+            oRGANIZARPARTIDOSToolStripMenuItem.Name = "oRGANIZARPARTIDOSToolStripMenuItem";
+            oRGANIZARPARTIDOSToolStripMenuItem.Size = new Size(220, 22);
+            oRGANIZARPARTIDOSToolStripMenuItem.Text = "ORGANIZAR PARTIDOS";
+            oRGANIZARPARTIDOSToolStripMenuItem.Click += oRGANIZARPARTIDOSToolStripMenuItem_Click;
             // 
             // gESTIONDEIDIOMASToolStripMenuItem
             // 
@@ -185,6 +194,13 @@ namespace Oasis_Sports
             sALIRToolStripMenuItem.Size = new Size(58, 20);
             sALIRToolStripMenuItem.Text = "SALIR";
             sALIRToolStripMenuItem.Click += sALIRToolStripMenuItem_Click;
+            // 
+            // rEGISTRARRESULTADOSToolStripMenuItem
+            // 
+            rEGISTRARRESULTADOSToolStripMenuItem.Name = "rEGISTRARRESULTADOSToolStripMenuItem";
+            rEGISTRARRESULTADOSToolStripMenuItem.Size = new Size(220, 22);
+            rEGISTRARRESULTADOSToolStripMenuItem.Text = "REGISTRAR RESULTADOS";
+            rEGISTRARRESULTADOSToolStripMenuItem.Click += rEGISTRARRESULTADOSToolStripMenuItem_Click;
             // 
             // FrmMenu
             // 
@@ -228,5 +244,7 @@ namespace Oasis_Sports
         private ToolStripMenuItem jUGADORESToolStripMenuItem;
         private ToolStripMenuItem tORNEOSToolStripMenuItem;
         private ToolStripMenuItem aSIGNAREQUIPOSToolStripMenuItem;
+        private ToolStripMenuItem oRGANIZARPARTIDOSToolStripMenuItem;
+        private ToolStripMenuItem rEGISTRARRESULTADOSToolStripMenuItem;
     }
 }
