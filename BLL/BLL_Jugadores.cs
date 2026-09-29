@@ -1,5 +1,6 @@
 ﻿using DAL;
 using Entidades;
+using Servicios;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,18 +24,23 @@ namespace BLL
         public void Alta_348LC(Jugador jugador_348LC)
         {
             ValidarJugador_348LC(jugador_348LC);
-            dalJugador_348LC.AñadirJugador_348LC(jugador_348LC);
+            jugador_348LC.Id = dalJugador_348LC.AñadirJugador_348LC(jugador_348LC);
+            RecalcularYGuardar_348LC(jugador_348LC);
+        }
+
+        public void Modificar_348LC(int idJugador_348LC, Jugador jugador_348LC)
+        {
+            jugador_348LC.Id = idJugador_348LC;
+            ValidarJugador_348LC(jugador_348LC);
+            dalJugador_348LC.ModificarJugador_348LC(idJugador_348LC, jugador_348LC);
+            RecalcularYGuardar_348LC(jugador_348LC);
         }
 
         public void Baja_348LC(int idJugador_348LC)
         {
             dalJugador_348LC.EliminarJugador_348LC(idJugador_348LC);
-        }
-
-        public void Modificar_348LC(int idJugador_348LC, Jugador jugador_348LC)
-        {
-            ValidarJugador_348LC(jugador_348LC);
-            dalJugador_348LC.ModificarJugador_348LC(idJugador_348LC, jugador_348LC);
+            Jugador jugadorActualizado_348LC = dalJugador_348LC.ObtenerPorId_348LC(idJugador_348LC);
+            RecalcularYGuardar_348LC(jugadorActualizado_348LC);
         }
 
         public Jugador ObtenerPorId_348LC(int idJugador_348LC)
@@ -69,6 +75,29 @@ namespace BLL
         public List<Jugador> ListarPorEquipo_348LC(int idEquipo_348LC)
         {
             return dalJugador_348LC.ListarPorEquipo_348LC(idEquipo_348LC);
+        }
+
+        private ValidadorDeIntegridad validador_348LC = new ValidadorDeIntegridad();
+
+        public bool VerificarIntegridad_348LC()
+        {
+            List<Jugador> jugadores_348LC = dalJugador_348LC.ObtenerTodosParaVerificar_348LC();
+            List<IVerificable> objetos_348LC = jugadores_348LC.Cast<IVerificable>().ToList();
+            List<int> dvhsGuardados_348LC = jugadores_348LC.Select(j => j.DVH).ToList();
+            int dvvGuardado_348LC = dalJugador_348LC.ObtenerDVV_348LC();
+
+            return validador_348LC.VerificarIntegridad(objetos_348LC, dvhsGuardados_348LC, dvvGuardado_348LC);
+        }
+
+        public void RecalcularYGuardar_348LC(Jugador jugador_348LC)
+        {
+            int dvh_348LC = validador_348LC.CalcularDV(jugador_348LC);
+            dalJugador_348LC.ActualizarDVH_348LC(jugador_348LC.Id, dvh_348LC);
+
+            List<Jugador> todos_348LC = dalJugador_348LC.ObtenerTodosParaVerificar_348LC();
+            List<IVerificable> objetos_348LC = todos_348LC.Cast<IVerificable>().ToList();
+            int dvv_348LC = validador_348LC.CalcularDVV(objetos_348LC);
+            dalJugador_348LC.ActualizarDVV_348LC(dvv_348LC);
         }
     }
 

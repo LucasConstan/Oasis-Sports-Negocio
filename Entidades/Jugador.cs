@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entidades
 {
-    public class Jugador
+    public class Jugador:IVerificable
     {
         public int Id { get; set; }
         public string DNI { get; set; }
@@ -18,5 +18,22 @@ namespace Entidades
         public int IdEquipo { get; set; }
         public bool Eliminado { get; set; }
         public string NombreEquipo { get; set; }
+
+        public int DVH { get; set; }
+
+        public int ObtenerIdParaDV() => Id;
+
+        public int[] ObtenerCamposParaDV()
+        {
+            return new int[]
+            {
+            Id,
+            DNI?.Length ?? 0,
+            Edad,
+            Numero,
+            IdEquipo,
+            Eliminado ? 1 : 0
+            };
+        }
     }
 }

@@ -83,14 +83,15 @@ namespace DAL
             return inscripcion_348LC;
         }
 
-        public void AñadirInscripcion_348LC(Inscripcion inscripcion_348LC)
+        public int AñadirInscripcion_348LC(Inscripcion inscripcion_348LC)
         {
             Conexion conexion_348LC = new Conexion();
             SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
             cn_348LC.Open();
 
             string query_348LC = @"INSERT INTO Inscripciones (Id_Torneo, Id_Equipo, FechaInscripcion)
-                     VALUES (@Id_Torneo, @Id_Equipo, @FechaInscripcion)";
+             VALUES (@Id_Torneo, @Id_Equipo, @FechaInscripcion);
+             SELECT CAST(SCOPE_IDENTITY() AS int)";
 
             using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
             {
@@ -98,7 +99,7 @@ namespace DAL
                 cmd_348LC.Parameters.AddWithValue("@Id_Equipo", inscripcion_348LC.IdEquipo);
                 cmd_348LC.Parameters.AddWithValue("@FechaInscripcion", inscripcion_348LC.FechaInscripcion);
 
-                cmd_348LC.ExecuteNonQuery();
+                return (int)cmd_348LC.ExecuteScalar();
             }
         }
 
@@ -157,6 +158,73 @@ namespace DAL
             }
 
             return jugador_348LC;
+        }
+
+        public List<Inscripcion> ObtenerTodosParaVerificar_348LC()
+        {
+            List<Inscripcion> lista_348LC = new List<Inscripcion>();
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "SELECT Id_Inscripcion, Id_Torneo, Id_Equipo, FechaInscripcion, Eliminado, DVH FROM Inscripciones";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())
+            {
+                while (reader_348LC.Read())
+                {
+                    lista_348LC.Add(new Inscripcion
+                    {
+                        Id = Convert.ToInt32(reader_348LC["Id_Inscripcion"]),
+                        IdTorneo = Convert.ToInt32(reader_348LC["Id_Torneo"]),
+                        IdEquipo = Convert.ToInt32(reader_348LC["Id_Equipo"]),
+                        FechaInscripcion = Convert.ToDateTime(reader_348LC["FechaInscripcion"]),
+                        Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"]),
+                        DVH = Convert.ToInt32(reader_348LC["DVH"])
+                    });
+                }
+            }
+            return lista_348LC;
+        }
+
+        public int ObtenerDVV_348LC()
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "SELECT ValorDVV FROM DVVertical WHERE Tabla = 'Inscripciones'";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                return (int)cmd_348LC.ExecuteScalar();
+        }
+
+        public void ActualizarDVH_348LC(int idInscripcion_348LC, int dvh_348LC)
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "UPDATE Inscripciones SET DVH = @dvh WHERE Id_Inscripcion = @id";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            {
+                cmd_348LC.Parameters.AddWithValue("@dvh", dvh_348LC);
+                cmd_348LC.Parameters.AddWithValue("@id", idInscripcion_348LC);
+                cmd_348LC.ExecuteNonQuery();
+            }
+        }
+
+        public void ActualizarDVV_348LC(int dvv_348LC)
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "UPDATE DVVertical SET ValorDVV = @dvv WHERE Tabla = 'Inscripciones'";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            {
+                cmd_348LC.Parameters.AddWithValue("@dvv", dvv_348LC);
+                cmd_348LC.ExecuteNonQuery();
+            }
         }
     }
 }

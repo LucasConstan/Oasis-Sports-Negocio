@@ -1,5 +1,6 @@
 ﻿using BLL;
 using Entidades;
+using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,6 +32,8 @@ namespace Oasis_Sports
         {
             dgvTorneos.DataSource = bllTorneo_348LC.Listar_348LC();
             dgvTorneos.Columns["Eliminado"].Visible = false;
+            dgvTorneos.Columns["DVH"].Visible = false;
+            dgvTorneos.Columns["Id"].Visible = false;
         }
 
         private void dgvTorneos_SelectionChanged(object sender, EventArgs e)
@@ -82,6 +85,15 @@ namespace Oasis_Sports
                 bllTorneo_348LC.Alta_348LC(ArmarTorneoDesdeCampos_348LC());
                 CargarGrilla_348LC();
                 LimpiarCampos_348LC();
+                BLL_Evento bllEvento = new BLL_Evento();
+                bllEvento.RegistrarEvento(new Evento()
+                {
+                    Usuario = "Lucas",
+                    Modulo = "Crear Torneo",
+                    Descripcion = "Nuevo torneo",
+                    Fecha = DateTime.Now,
+                    Criticidad = 4
+                });
                 MessageBox.Show("Torneo creado correctamente.");
             }
             catch (Exception ex_348LC)

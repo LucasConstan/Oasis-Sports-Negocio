@@ -47,14 +47,15 @@ namespace DAL
             return lista_348LC;
         }
 
-        public void AñadirEquipo_348LC(Equipo equipo_348LC)
+        public int AñadirEquipo_348LC(Equipo equipo_348LC)
         {
             Conexion conexion_348LC = new Conexion();
             SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
             cn_348LC.Open();
 
             string query_348LC = @"INSERT INTO Equipos (NombreEquipo, NombreResponsable, ColorPrincipal, ColorSecundario)
-                     VALUES (@NombreEquipo, @NombreResponsable, @ColorPrincipal, @ColorSecundario)";
+             VALUES (@NombreEquipo, @NombreResponsable, @ColorPrincipal, @ColorSecundario);
+             SELECT CAST(SCOPE_IDENTITY() AS int)";
 
             using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
             {
@@ -63,7 +64,7 @@ namespace DAL
                 cmd_348LC.Parameters.AddWithValue("@ColorPrincipal", equipo_348LC.ColorPrincipal);
                 cmd_348LC.Parameters.AddWithValue("@ColorSecundario", equipo_348LC.ColorSecundario);
 
-                cmd_348LC.ExecuteNonQuery();
+                return (int)cmd_348LC.ExecuteScalar();
             }
         }
 
@@ -141,6 +142,74 @@ namespace DAL
             }
 
             return equipo_348LC;
+        }
+
+        public List<Equipo> ObtenerTodosParaVerificar_348LC()
+        {
+            List<Equipo> lista_348LC = new List<Equipo>();
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "SELECT Id_Equipo, NombreEquipo, NombreResponsable, ColorPrincipal, ColorSecundario, Eliminado, DVH FROM Equipos";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())
+            {
+                while (reader_348LC.Read())
+                {
+                    lista_348LC.Add(new Equipo
+                    {
+                        Id = Convert.ToInt32(reader_348LC["Id_Equipo"]),
+                        NombreEquipo = reader_348LC["NombreEquipo"].ToString(),
+                        NombreResponsable = reader_348LC["NombreResponsable"].ToString(),
+                        ColorPrincipal = reader_348LC["ColorPrincipal"].ToString(),
+                        ColorSecundario = reader_348LC["ColorSecundario"].ToString(),
+                        Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"]),
+                        DVH = Convert.ToInt32(reader_348LC["DVH"])
+                    });
+                }
+            }
+            return lista_348LC;
+        }
+
+        public int ObtenerDVV_348LC()
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "SELECT ValorDVV FROM DVVertical WHERE Tabla = 'Equipos'";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                return (int)cmd_348LC.ExecuteScalar();
+        }
+
+        public void ActualizarDVH_348LC(int idEquipo_348LC, int dvh_348LC)
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "UPDATE Equipos SET DVH = @dvh WHERE Id_Equipo = @id";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            {
+                cmd_348LC.Parameters.AddWithValue("@dvh", dvh_348LC);
+                cmd_348LC.Parameters.AddWithValue("@id", idEquipo_348LC);
+                cmd_348LC.ExecuteNonQuery();
+            }
+        }
+
+        public void ActualizarDVV_348LC(int dvv_348LC)
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "UPDATE DVVertical SET ValorDVV = @dvv WHERE Tabla = 'Equipos'";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            {
+                cmd_348LC.Parameters.AddWithValue("@dvv", dvv_348LC);
+                cmd_348LC.ExecuteNonQuery();
+            }
         }
     }
 }

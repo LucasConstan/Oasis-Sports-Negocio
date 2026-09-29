@@ -18,10 +18,15 @@ namespace DAL
             SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
             cn_348LC.Open();
 
-            string query_348LC = @"SELECT Id_Partido, Id_Torneo, Id_EquipoLocal, Id_EquipoVisitante, FechaPartido, HoraInicio,
-                     NumeroCancha, GolesEquipoLocal, GolesEquipoVisitante, Suspendido, Eliminado
-                     FROM Partidos
-                     WHERE Id_Torneo = @Id_Torneo AND GolesEquipoLocal IS NULL AND Suspendido = 0 AND Eliminado = 0";
+            string query_348LC = @"SELECT P.Id_Partido, P.Id_Torneo, T.NombreTorneo, P.Id_EquipoLocal, P.Id_EquipoVisitante,
+             EL.NombreEquipo AS NombreEquipoLocal, EV.NombreEquipo AS NombreEquipoVisitante,
+             P.FechaPartido, P.HoraInicio, P.NumeroCancha, P.GolesEquipoLocal, P.GolesEquipoVisitante,
+             P.Suspendido, P.Eliminado
+             FROM Partidos P
+             JOIN Torneos T ON T.Id_Torneo = P.Id_Torneo
+             JOIN Equipos EL ON EL.Id_Equipo = P.Id_EquipoLocal
+             JOIN Equipos EV ON EV.Id_Equipo = P.Id_EquipoVisitante
+             WHERE P.Id_Torneo = @Id_Torneo AND P.Eliminado = 0";
 
             using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
             {
@@ -35,13 +40,16 @@ namespace DAL
                         {
                             Id = Convert.ToInt32(reader_348LC["Id_Partido"]),
                             IdTorneo = Convert.ToInt32(reader_348LC["Id_Torneo"]),
+                            NombreTorneo = reader_348LC["NombreTorneo"].ToString(),
+                            EquipoLocal = reader_348LC["NombreEquipoLocal"].ToString(),
+                            EquipoVisitante = reader_348LC["NombreEquipoVisitante"].ToString(),
                             IdEquipoLocal = Convert.ToInt32(reader_348LC["Id_EquipoLocal"]),
                             IdEquipoVisitante = Convert.ToInt32(reader_348LC["Id_EquipoVisitante"]),
                             FechaPartido = Convert.ToDateTime(reader_348LC["FechaPartido"]),
                             HoraInicio = (TimeSpan)reader_348LC["HoraInicio"],
                             NumeroCancha = Convert.ToInt32(reader_348LC["NumeroCancha"]),
                             Suspendido = Convert.ToBoolean(reader_348LC["Suspendido"]),
-                            Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"]),
+                            Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"]), 
                         });
                     }
                 }

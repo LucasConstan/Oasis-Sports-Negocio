@@ -113,6 +113,8 @@
             dgvFixture.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvFixture.Location = new Point(71, 325);
             dgvFixture.Name = "dgvFixture";
+            dgvFixture.ReadOnly = true;
+            dgvFixture.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvFixture.Size = new Size(644, 305);
             dgvFixture.TabIndex = 7;
             // 

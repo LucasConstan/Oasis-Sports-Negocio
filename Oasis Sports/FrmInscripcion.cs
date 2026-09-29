@@ -61,6 +61,8 @@ namespace Oasis_Sports
             int idTorneo_348LC = Convert.ToInt32(cmbTorneo.SelectedValue);
             dgvEquiposInscriptos.DataSource = bllInscripcion_348LC.ListarEquiposDelTorneo_348LC(idTorneo_348LC);
             dgvEquiposInscriptos.Columns["Eliminado"].Visible = false;
+            dgvEquiposInscriptos.Columns["DVH"].Visible = false;
+            dgvEquiposInscriptos.Columns["Id"].Visible = false;
         }
 
 
@@ -69,6 +71,8 @@ namespace Oasis_Sports
         {
             dgvJugadoresEquipo.DataSource = bllJugador_348LC.ListarPorEquipo_348LC(idEquipoSeleccionado_348LC);
             dgvJugadoresEquipo.Columns["Eliminado"].Visible = false;
+            dgvJugadoresEquipo.Columns["DVH"].Visible = false;
+            dgvJugadoresEquipo.Columns["Id"].Visible = false;
         }
 
         private void dgvEquiposInscriptos_SelectionChanged(object sender, EventArgs e)

@@ -38,6 +38,12 @@ namespace Oasis_Sports
             int idTorneo_348LC = Convert.ToInt32(cmbTorneo.SelectedValue);
             dgvPartidosPendientes.DataSource = bllResultado_348LC.ListarPendientes_348LC(idTorneo_348LC);
             dgvPartidosPendientes.Columns["Eliminado"].Visible = false;
+            dgvPartidosPendientes.Columns["DVH"].Visible = false;
+            dgvPartidosPendientes.Columns["Id"].Visible = false;
+            dgvPartidosPendientes.Columns["IdEquipoLocal"].Visible = false;
+            dgvPartidosPendientes.Columns["IdEquipoVisitante"].Visible = false;
+            dgvPartidosPendientes.Columns["IdTorneo"].Visible = false;
+
         }
 
         private void cmbTorneo_SelectedIndexChanged(object sender, EventArgs e)

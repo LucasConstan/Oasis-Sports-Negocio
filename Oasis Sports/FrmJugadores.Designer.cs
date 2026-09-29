@@ -172,6 +172,7 @@
             dgvJugadores.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvJugadores.Size = new Size(577, 617);
             dgvJugadores.TabIndex = 23;
+            dgvJugadores.SelectionChanged += dgvJugadores_SelectionChanged;
             // 
             // txtPosicion
             // 

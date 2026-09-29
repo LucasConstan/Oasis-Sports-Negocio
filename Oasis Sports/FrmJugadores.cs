@@ -41,29 +41,11 @@ namespace Oasis_Sports
             dgvJugadores.DataSource = bllJugador_348LC.Listar_348LC();
             dgvJugadores.Columns["Eliminado"].Visible = false;
             dgvJugadores.Columns["IdEquipo"].Visible = false;
+            dgvJugadores.Columns["DVH"].Visible = false;
+            dgvJugadores.Columns["Id"].Visible = false;
         }
 
-        private void dgvJugadores_SelectionChanged(object sender, EventArgs e)
-        {
-            if (dgvJugadores.CurrentRow == null)
-                return;
-
-            Jugador jugador_348LC = (Jugador)dgvJugadores.CurrentRow.DataBoundItem;
-
-            idSeleccionado_348LC = jugador_348LC.Id;
-            txtDNI.Text = jugador_348LC.DNI;
-            txtNombre.Text = jugador_348LC.Nombre;
-            txtApellido.Text = jugador_348LC.Apellido;
-            nudEdad.Value = jugador_348LC.Edad;
-            txtPosicion.Text = jugador_348LC.Posicion;
-            nudNumero.Value = jugador_348LC.Numero;
-            cmbEquipo.SelectedValue = jugador_348LC.IdEquipo;
-        }
-
-
-
-
-
+   
 
 
         private void btnAñadir_Click_1(object sender, EventArgs e)
@@ -151,6 +133,23 @@ namespace Oasis_Sports
             FrmMenu frmMenu = new FrmMenu();
             frmMenu.Show();
             this.Hide();
+        }
+
+        private void dgvJugadores_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dgvJugadores.CurrentRow == null)
+                return;
+
+            Jugador jugador_348LC = (Jugador)dgvJugadores.CurrentRow.DataBoundItem;
+
+            idSeleccionado_348LC = jugador_348LC.Id;
+            txtDNI.Text = jugador_348LC.DNI;
+            txtNombre.Text = jugador_348LC.Nombre;
+            txtApellido.Text = jugador_348LC.Apellido;
+            nudEdad.Value = jugador_348LC.Edad;
+            txtPosicion.Text = jugador_348LC.Posicion;
+            nudNumero.Value = jugador_348LC.Numero;
+            cmbEquipo.SelectedValue = jugador_348LC.IdEquipo;
         }
     }
 }

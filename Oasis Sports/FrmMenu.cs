@@ -166,6 +166,7 @@ namespace Oasis_Sports
             gESTIONDERESERVASToolStripMenuItem.Visible = false;
             gESTIONDEIDIOMASToolStripMenuItem.Visible = false;
             bITACORADECAMBIOSToolStripMenuItem.Visible = false;
+            mAESTROSToolStripMenuItem.Visible = false;
 
         }
 
@@ -179,6 +180,7 @@ namespace Oasis_Sports
                 gESTIONDEPERFILESToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "GPE");
                 gESTIONDEIDIOMASToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "GID");
                 bITACORADECAMBIOSToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "BDC");
+                mAESTROSToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "MAE");
 
 
                 bitacoraToolStripMenuItem.Visible = true;

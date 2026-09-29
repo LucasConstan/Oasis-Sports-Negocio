@@ -88,14 +88,15 @@ namespace DAL
             return lista_348LC;
         }
 
-        public void AñadirJugador_348LC(Jugador jugador_348LC)
+        public int AñadirJugador_348LC(Jugador jugador_348LC)
         {
             Conexion conexion_348LC = new Conexion();
             SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
             cn_348LC.Open();
 
             string query_348LC = @"INSERT INTO Jugadores (DNI, Nombre, Apellido, Edad, Posicion, Numero, Id_Equipo)
-                     VALUES (@DNI, @Nombre, @Apellido, @Edad, @Posicion, @Numero, @Id_Equipo)";
+             VALUES (@DNI, @Nombre, @Apellido, @Edad, @Posicion, @Numero, @Id_Equipo);
+             SELECT CAST(SCOPE_IDENTITY() AS int)";
 
             using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
             {
@@ -107,7 +108,7 @@ namespace DAL
                 cmd_348LC.Parameters.AddWithValue("@Numero", jugador_348LC.Numero);
                 cmd_348LC.Parameters.AddWithValue("@Id_Equipo", jugador_348LC.IdEquipo);
 
-                cmd_348LC.ExecuteNonQuery();
+                return (int)cmd_348LC.ExecuteScalar();
             }
         }
 
@@ -194,6 +195,77 @@ namespace DAL
             }
 
             return jugador_348LC;
+        }
+
+        public List<Jugador> ObtenerTodosParaVerificar_348LC()
+        {
+            List<Jugador> lista_348LC = new List<Jugador>();
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "SELECT Id_Jugador, DNI, Nombre, Apellido, Edad, Posicion, Numero, Id_Equipo, Eliminado, DVH FROM Jugadores";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())
+            {
+                while (reader_348LC.Read())
+                {
+                    lista_348LC.Add(new Jugador
+                    {
+                        Id = Convert.ToInt32(reader_348LC["Id_Jugador"]),
+                        DNI = reader_348LC["DNI"].ToString(),
+                        Nombre = reader_348LC["Nombre"].ToString(),
+                        Apellido = reader_348LC["Apellido"].ToString(),
+                        Edad = Convert.ToInt32(reader_348LC["Edad"]),
+                        Posicion = reader_348LC["Posicion"].ToString(),
+                        Numero = Convert.ToInt32(reader_348LC["Numero"]),
+                        IdEquipo = Convert.ToInt32(reader_348LC["Id_Equipo"]),
+                        Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"]),
+                        DVH = Convert.ToInt32(reader_348LC["DVH"])
+                    });
+                }
+            }
+            return lista_348LC;
+        }
+
+        public int ObtenerDVV_348LC()
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "SELECT ValorDVV FROM DVVertical WHERE Tabla = 'Jugadores'";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                return (int)cmd_348LC.ExecuteScalar();
+        }
+
+        public void ActualizarDVH_348LC(int idJugador_348LC, int dvh_348LC)
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "UPDATE Jugadores SET DVH = @dvh WHERE Id_Jugador = @id";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            {
+                cmd_348LC.Parameters.AddWithValue("@dvh", dvh_348LC);
+                cmd_348LC.Parameters.AddWithValue("@id", idJugador_348LC);
+                cmd_348LC.ExecuteNonQuery();
+            }
+        }
+
+        public void ActualizarDVV_348LC(int dvv_348LC)
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "UPDATE DVVertical SET ValorDVV = @dvv WHERE Tabla = 'Jugadores'";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            {
+                cmd_348LC.Parameters.AddWithValue("@dvv", dvv_348LC);
+                cmd_348LC.ExecuteNonQuery();
+            }
         }
     }
 }

@@ -101,6 +101,8 @@ namespace Oasis_Sports
         {
             dgvEquipos.DataSource = bllEquipo_348LC.Listar_348LC();
             dgvEquipos.Columns["Eliminado"].Visible = false;
+            dgvEquipos.Columns["DVH"].Visible = false;
+            dgvEquipos.Columns["Id"].Visible = false;
         }
 
         private void dgvEquipos_SelectionChanged(object sender, EventArgs e)

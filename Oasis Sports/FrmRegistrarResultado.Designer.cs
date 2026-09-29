@@ -71,6 +71,8 @@
             dgvPartidosPendientes.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvPartidosPendientes.Location = new Point(32, 132);
             dgvPartidosPendientes.Name = "dgvPartidosPendientes";
+            dgvPartidosPendientes.ReadOnly = true;
+            dgvPartidosPendientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvPartidosPendientes.Size = new Size(590, 313);
             dgvPartidosPendientes.TabIndex = 3;
             dgvPartidosPendientes.SelectionChanged += dgvPartidosPendientes_SelectionChanged;

@@ -49,14 +49,15 @@ namespace DAL
             return lista_348LC;
         }
 
-        public void AñadirTorneo_348LC(Torneo torneo_348LC)
+        public int AñadirTorneo_348LC(Torneo torneo_348LC)
         {
             Conexion conexion_348LC = new Conexion();
             SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
             cn_348LC.Open();
 
             string query_348LC = @"INSERT INTO Torneos (NombreTorneo, Descripcion, Categoria, FechaInicio, FechaFin, CantidadMaximaEquipos)
-                     VALUES (@NombreTorneo, @Descripcion, @Categoria, @FechaInicio, @FechaFin, @CantidadMaximaEquipos)";
+             VALUES (@NombreTorneo, @Descripcion, @Categoria, @FechaInicio, @FechaFin, @CantidadMaximaEquipos);
+             SELECT CAST(SCOPE_IDENTITY() AS int)";
 
             using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
             {
@@ -67,7 +68,7 @@ namespace DAL
                 cmd_348LC.Parameters.AddWithValue("@FechaFin", torneo_348LC.FechaFin);
                 cmd_348LC.Parameters.AddWithValue("@CantidadMaximaEquipos", torneo_348LC.CantidadMaximaEquipos);
 
-                cmd_348LC.ExecuteNonQuery();
+                return (int)cmd_348LC.ExecuteScalar();
             }
         }
 
@@ -189,6 +190,76 @@ namespace DAL
             }
 
             return torneo_348LC;
+        }
+
+        public List<Torneo> ObtenerTodosParaVerificar_348LC()
+        {
+            List<Torneo> lista_348LC = new List<Torneo>();
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "SELECT Id_Torneo, NombreTorneo, Descripcion, Categoria, FechaInicio, FechaFin, CantidadMaximaEquipos, Eliminado, DVH FROM Torneos";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())
+            {
+                while (reader_348LC.Read())
+                {
+                    lista_348LC.Add(new Torneo
+                    {
+                        Id = Convert.ToInt32(reader_348LC["Id_Torneo"]),
+                        NombreTorneo = reader_348LC["NombreTorneo"].ToString(),
+                        Descripcion = reader_348LC["Descripcion"] == DBNull.Value ? null : reader_348LC["Descripcion"].ToString(),
+                        Categoria = reader_348LC["Categoria"].ToString(),
+                        FechaInicio = Convert.ToDateTime(reader_348LC["FechaInicio"]),
+                        FechaFin = Convert.ToDateTime(reader_348LC["FechaFin"]),
+                        CantidadMaximaEquipos = Convert.ToInt32(reader_348LC["CantidadMaximaEquipos"]),
+                        Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"]),
+                        DVH = Convert.ToInt32(reader_348LC["DVH"])
+                    });
+                }
+            }
+            return lista_348LC;
+        }
+
+        public int ObtenerDVV_348LC()
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "SELECT ValorDVV FROM DVVertical WHERE Tabla = 'Torneos'";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                return (int)cmd_348LC.ExecuteScalar();
+        }
+
+        public void ActualizarDVH_348LC(int idTorneo_348LC, int dvh_348LC)
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "UPDATE Torneos SET DVH = @dvh WHERE Id_Torneo = @id";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            {
+                cmd_348LC.Parameters.AddWithValue("@dvh", dvh_348LC);
+                cmd_348LC.Parameters.AddWithValue("@id", idTorneo_348LC);
+                cmd_348LC.ExecuteNonQuery();
+            }
+        }
+
+        public void ActualizarDVV_348LC(int dvv_348LC)
+        {
+            Conexion conexion_348LC = new Conexion();
+            SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
+            cn_348LC.Open();
+
+            string query_348LC = "UPDATE DVVertical SET ValorDVV = @dvv WHERE Tabla = 'Torneos'";
+            using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+            {
+                cmd_348LC.Parameters.AddWithValue("@dvv", dvv_348LC);
+                cmd_348LC.ExecuteNonQuery();
+            }
         }
     }
 }

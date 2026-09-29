@@ -54,6 +54,11 @@ namespace Oasis_Sports
         {
             dgvFixture.DataSource = bllPartido_348LC.ListarPorTorneo_348LC(idTorneo_348LC);
             dgvFixture.Columns["Eliminado"].Visible = false;
+            dgvFixture.Columns["DVH"].Visible = false;
+            dgvFixture.Columns["Id"].Visible = false;
+            dgvFixture.Columns["IdEquipoLocal"].Visible = false;
+            dgvFixture.Columns["IdEquipoVisitante"].Visible = false;
+            dgvFixture.Columns["IdTorneo"].Visible = false;
         }
 
         private void btnProgramar_Click(object sender, EventArgs e)

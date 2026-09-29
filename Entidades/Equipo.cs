@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entidades
 {
-    public class Equipo
+    public class Equipo: IVerificable
     {
         public int Id { get; set; }
         public string NombreEquipo { get; set; }
@@ -14,5 +14,19 @@ namespace Entidades
         public string ColorPrincipal { get; set; }
         public string ColorSecundario { get; set; }
         public bool Eliminado { get; set; }
+        public int DVH { get; set; }
+
+        public int ObtenerIdParaDV() => Id;
+
+        public int[] ObtenerCamposParaDV()
+        {
+            return new int[]
+            {
+            Id,
+            NombreEquipo?.Length ?? 0,
+            NombreResponsable?.Length ?? 0,
+            Eliminado ? 1 : 0
+            };
+        }
     }
 }

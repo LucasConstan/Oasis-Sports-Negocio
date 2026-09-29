@@ -54,6 +54,8 @@
             dgvTorneos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvTorneos.Location = new Point(422, 53);
             dgvTorneos.Name = "dgvTorneos";
+            dgvTorneos.ReadOnly = true;
+            dgvTorneos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvTorneos.Size = new Size(435, 449);
             dgvTorneos.TabIndex = 0;
             dgvTorneos.SelectionChanged += dgvTorneos_SelectionChanged;
@@ -102,6 +104,7 @@
             // cmbCategoria
             // 
             cmbCategoria.FormattingEnabled = true;
+            cmbCategoria.Items.AddRange(new object[] { "FUTBOL 7", "FUTBOL 5", "FUTBOL 11" });
             cmbCategoria.Location = new Point(177, 160);
             cmbCategoria.Name = "cmbCategoria";
             cmbCategoria.Size = new Size(197, 29);
