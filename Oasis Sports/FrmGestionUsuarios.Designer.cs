@@ -39,6 +39,7 @@
             btnModificar = new Button();
             btnEliminar = new Button();
             btnVolver = new Button();
+            btnDesbloquear = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -148,14 +149,26 @@
             // 
             btnVolver.BackColor = Color.White;
             btnVolver.ForeColor = Color.DarkGreen;
-            btnVolver.Location = new Point(12, 392);
+            btnVolver.Location = new Point(12, 441);
             btnVolver.Name = "btnVolver";
             btnVolver.Size = new Size(209, 35);
-            btnVolver.TabIndex = 10;
+            btnVolver.TabIndex = 11;
             btnVolver.Text = "VOLVER";
             btnVolver.UseVisualStyleBackColor = false;
             btnVolver.Click += button1_Click;
-            // 
+            //
+            // btnDesbloquear
+            //
+            btnDesbloquear.BackColor = Color.White;
+            btnDesbloquear.ForeColor = Color.DarkGreen;
+            btnDesbloquear.Location = new Point(12, 392);
+            btnDesbloquear.Name = "btnDesbloquear";
+            btnDesbloquear.Size = new Size(209, 35);
+            btnDesbloquear.TabIndex = 10;
+            btnDesbloquear.Text = "DESBLOQUEAR";
+            btnDesbloquear.UseVisualStyleBackColor = false;
+            btnDesbloquear.Click += btnDesbloquear_Click;
+            //
             // FrmGestionUsuarios
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -163,6 +176,7 @@
             BackColor = Color.FromArgb(224, 224, 224);
             ClientSize = new Size(881, 482);
             Controls.Add(btnVolver);
+            Controls.Add(btnDesbloquear);
             Controls.Add(btnEliminar);
             Controls.Add(btnModificar);
             Controls.Add(btnAñadir);
@@ -195,5 +209,6 @@
         private Button btnModificar;
         private Button btnEliminar;
         private Button btnVolver;
+        private Button btnDesbloquear;
     }
 }

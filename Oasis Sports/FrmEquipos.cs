@@ -1,5 +1,6 @@
 ﻿using BLL;
 using Entidades;
+using Servicios;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,11 +13,48 @@ using System.Windows.Forms;
 
 namespace Oasis_Sports
 {
-    public partial class FrmEquipos : BaseForm
+    public partial class FrmEquipos : BaseForm, IObserverIdioma
     {
         public FrmEquipos()
         {
             InitializeComponent();
+            LanguageManager.GetInstance().Agregar(this);
+        }
+
+        public void ActualizarIdioma()
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new Action(() => LanguageManager.GetInstance().TraducirControles(this)));
+            else
+                LanguageManager.GetInstance().TraducirControles(this);
+        }
+
+        private void RegistrarClaves()
+        {
+            int idIdioma = LanguageManager.GetInstance().IdIdiomaActual;
+            BLL_Traduccion bll = new BLL_Traduccion();
+            List<string> clavesExistentes = bll.ObtenerTodasLasClaves();
+
+            foreach (Control c in this.Controls)
+                RegistrarRecursivo(c, idIdioma, bll, clavesExistentes);
+        }
+
+        private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll, List<string> clavesExistentes)
+        {
+            if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
+                && !clavesExistentes.Contains(c.Name))
+            {
+                bll.GuardarOActualizar(new Traduccion
+                {
+                    IdIdioma = idIdioma,
+                    Clave = c.Name,
+                    Texto = c.Text
+                });
+                clavesExistentes.Add(c.Name);
+            }
+
+            foreach (Control hijo in c.Controls)
+                RegistrarRecursivo(hijo, idIdioma, bll, clavesExistentes);
         }
 
         BLL_Equipo bllEquipo_348LC = new BLL_Equipo();
@@ -128,6 +166,9 @@ namespace Oasis_Sports
 
         private void FrmEquipos_Load(object sender, EventArgs e)
         {
+            RegistrarClaves();
+            LanguageManager.GetInstance().TraducirControles(this);
+
             CargarGrilla_348LC();
         }
     }

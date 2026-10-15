@@ -95,12 +95,20 @@ namespace Oasis_Sports
         {
             if (cmbIdiomas.SelectedValue == null || string.IsNullOrWhiteSpace(txtClave.Text)) return;
 
-            bllTraduccion.GuardarOActualizar(new Traduccion
+            try
             {
-                IdIdioma = (int)cmbIdiomas.SelectedValue,
-                Clave = txtClave.Text.Trim(),
-                Texto = txtTexto.Text.Trim()
-            });
+                bllTraduccion.GuardarOActualizar(new Traduccion
+                {
+                    IdIdioma = (int)cmbIdiomas.SelectedValue,
+                    Clave = txtClave.Text.Trim(),
+                    Texto = txtTexto.Text.Trim()
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             MessageBox.Show("Traducción guardada correctamente.");
             CargarClaves();
@@ -116,7 +124,15 @@ namespace Oasis_Sports
                 return;
             }
 
-            bllIdioma.Agregar(new Idioma { Nombre = nombre });
+            try
+            {
+                bllIdioma.Agregar(new Idioma { Nombre = nombre });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             txtNuevoIdioma.Text = "";
             MessageBox.Show("Idioma creado correctamente.");
             CargarIdiomas();

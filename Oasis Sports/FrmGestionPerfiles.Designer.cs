@@ -31,7 +31,7 @@
             treeView1 = new TreeView();
             lblPermisosActivos = new Label();
             cmbUsuarios = new ComboBox();
-            lblUsuario = new Label();
+            lblUsuarios = new Label();
             btnAgregar = new Button();
             btnQuitar = new Button();
             lstDisponibles = new ListBox();
@@ -64,14 +64,14 @@
             cmbUsuarios.TabIndex = 2;
             cmbUsuarios.SelectedIndexChanged += cmbUsuarios_SelectedIndexChanged;
             // 
-            // lblUsuario
+            // lblUsuarios
             // 
-            lblUsuario.AutoSize = true;
-            lblUsuario.Location = new Point(34, 53);
-            lblUsuario.Name = "lblUsuario";
-            lblUsuario.Size = new Size(76, 21);
-            lblUsuario.TabIndex = 3;
-            lblUsuario.Text = "Usuarios";
+            lblUsuarios.AutoSize = true;
+            lblUsuarios.Location = new Point(34, 53);
+            lblUsuarios.Name = "lblUsuarios";
+            lblUsuarios.Size = new Size(76, 21);
+            lblUsuarios.TabIndex = 3;
+            lblUsuarios.Text = "Usuarios";
             // 
             // btnAgregar
             // 
@@ -132,7 +132,7 @@
             Controls.Add(lstDisponibles);
             Controls.Add(btnQuitar);
             Controls.Add(btnAgregar);
-            Controls.Add(lblUsuario);
+            Controls.Add(lblUsuarios);
             Controls.Add(cmbUsuarios);
             Controls.Add(lblPermisosActivos);
             Controls.Add(treeView1);
@@ -149,7 +149,7 @@
         private TreeView treeView1;
         private Label lblPermisosActivos;
         private ComboBox cmbUsuarios;
-        private Label lblUsuario;
+        private Label lblUsuarios;
         private Button btnAgregar;
         private Button btnQuitar;
         private ListBox lstDisponibles;

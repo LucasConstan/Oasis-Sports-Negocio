@@ -44,7 +44,7 @@
             lblPosicion = new Label();
             lblNumero = new Label();
             cmbEquipo = new ComboBox();
-            label1 = new Label();
+            lblEquipo = new Label();
             nudNumero = new NumericUpDown();
             nudEdad = new NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)dgvJugadores).BeginInit();
@@ -209,15 +209,15 @@
             cmbEquipo.Size = new Size(205, 29);
             cmbEquipo.TabIndex = 40;
             // 
-            // label1
+            // lblEquipo
             // 
-            label1.AutoSize = true;
-            label1.ForeColor = Color.DarkGreen;
-            label1.Location = new Point(14, 426);
-            label1.Name = "label1";
-            label1.Size = new Size(79, 21);
-            label1.TabIndex = 41;
-            label1.Text = "EQUIPO";
+            lblEquipo.AutoSize = true;
+            lblEquipo.ForeColor = Color.DarkGreen;
+            lblEquipo.Location = new Point(14, 426);
+            lblEquipo.Name = "lblEquipo";
+            lblEquipo.Size = new Size(79, 21);
+            lblEquipo.TabIndex = 41;
+            lblEquipo.Text = "EQUIPO";
             // 
             // nudNumero
             // 
@@ -240,7 +240,7 @@
             ClientSize = new Size(874, 684);
             Controls.Add(nudEdad);
             Controls.Add(nudNumero);
-            Controls.Add(label1);
+            Controls.Add(lblEquipo);
             Controls.Add(cmbEquipo);
             Controls.Add(lblNumero);
             Controls.Add(txtPosicion);
@@ -285,7 +285,7 @@
         private Label lblPosicion;
         private Label lblNumero;
         private ComboBox cmbEquipo;
-        private Label label1;
+        private Label lblEquipo;
         private NumericUpDown nudNumero;
         private NumericUpDown nudEdad;
     }

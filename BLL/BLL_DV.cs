@@ -44,5 +44,35 @@ namespace BLL
             dal_DV.InicializarDVs();
         }
 
+        public List<string> ObtenerTablasAlteradas()
+        {
+            List<string> tablas = new List<string>();
+
+            if (!VerificarIntegridad()) tablas.Add("Usuarios");
+            if (!new BLL_Equipo().VerificarIntegridad_348LC()) tablas.Add("Equipos");
+            if (!new BLL_Jugador().VerificarIntegridad_348LC()) tablas.Add("Jugadores");
+            if (!new BLL_Torneo().VerificarIntegridad_348LC()) tablas.Add("Torneos");
+            if (!new BLL_Inscripcion().VerificarIntegridad_348LC()) tablas.Add("Inscripciones");
+            if (!new BLL_Partido().VerificarIntegridad_348LC()) tablas.Add("Partidos");
+
+            return tablas;
+        }
+
+        public void RecalcularTablas(List<string> tablas)
+        {
+            foreach (string tabla in tablas)
+            {
+                switch (tabla)
+                {
+                    case "Usuarios": InicializarDVs(); break;
+                    case "Equipos": new BLL_Equipo().RecalcularTodos_348LC(); break;
+                    case "Jugadores": new BLL_Jugador().RecalcularTodos_348LC(); break;
+                    case "Torneos": new BLL_Torneo().RecalcularTodos_348LC(); break;
+                    case "Inscripciones": new BLL_Inscripcion().RecalcularTodos_348LC(); break;
+                    case "Partidos": new BLL_Partido().RecalcularTodos_348LC(); break;
+                }
+            }
+        }
+
     }
 }

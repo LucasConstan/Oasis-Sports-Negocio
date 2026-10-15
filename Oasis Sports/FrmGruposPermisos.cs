@@ -118,9 +118,13 @@ namespace Oasis_Sports
             if (permiso == null)
                 return;
 
-            if (permisosSeleccionados.Any(p => p.Id == permiso.Id))
+            try
             {
-                MessageBox.Show("Ese permiso ya fue agregado al grupo.");
+                permisoBLL.ValidarPermisoParaGrupo(grupoIdSeleccionado, permiso, permisosSeleccionados);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -165,29 +169,37 @@ namespace Oasis_Sports
                 return;
             }
 
-            if (modoModificacion)
+            try
             {
-                permisoBLL.ModificarGrupoPermiso(grupoIdSeleccionado, nombreGrupo, permisosSeleccionados);
-                MessageBox.Show("Grupo modificado correctamente.");
-            }
-            else
-            {
-                List<ComponentePermiso> existentes = permisoBLL.ObtenerTodos();
-
-                if (permisoBLL.ExisteGrupoConNombre(nombreGrupo, existentes))
+                if (modoModificacion)
                 {
-                    MessageBox.Show(
-                        $"Ya existe un grupo con el nombre '{nombreGrupo}'.",
-                        "Nombre duplicado",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Warning);
-                    return;
+                    permisoBLL.ModificarGrupoPermiso(grupoIdSeleccionado, nombreGrupo, permisosSeleccionados);
+                    MessageBox.Show("Grupo modificado correctamente.");
                 }
+                else
+                {
+                    List<ComponentePermiso> existentes = permisoBLL.ObtenerTodos();
 
-                int grupoId = permisoBLL.CrearGrupoPermiso(nombreGrupo);
-                foreach (ComponentePermiso permiso in permisosSeleccionados)
-                    permisoBLL.AgregarPermisoAGrupo(grupoId, permiso.Id);
-                MessageBox.Show("Grupo creado correctamente.");
+                    if (permisoBLL.ExisteGrupoConNombre(nombreGrupo, existentes))
+                    {
+                        MessageBox.Show(
+                            $"Ya existe un grupo con el nombre '{nombreGrupo}'.",
+                            "Nombre duplicado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    int grupoId = permisoBLL.CrearGrupoPermiso(nombreGrupo);
+                    foreach (ComponentePermiso permiso in permisosSeleccionados)
+                        permisoBLL.AgregarPermisoAGrupo(grupoId, permiso.Id);
+                    MessageBox.Show("Grupo creado correctamente.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
 
 
@@ -271,9 +283,16 @@ namespace Oasis_Sports
                 return;
             }
 
-            permisoBLL.EliminarGrupoPermiso(grupo.Id);
-            MessageBox.Show("Grupo eliminado correctamente.");
-            CargarPermisosDisponibles();
+            try
+            {
+                permisoBLL.EliminarGrupoPermiso(grupo.Id);
+                MessageBox.Show("Grupo eliminado correctamente.");
+                CargarPermisosDisponibles();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Operación no permitida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
     }
 }

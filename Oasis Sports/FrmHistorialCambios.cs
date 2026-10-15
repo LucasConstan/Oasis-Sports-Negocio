@@ -86,7 +86,16 @@ namespace Oasis_Sports
             if (confirmacion != DialogResult.Yes) return;
 
             string quienRestaura = SessionManager.GetInstance().Usuario?.Username ?? "sistema";
-            bllHistorial.RestaurarCampo(idUsuario, campo, valorAnterior, quienRestaura);
+            try
+            {
+                bllHistorial.RestaurarCampo(idUsuario, campo, valorAnterior, quienRestaura);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Operación no permitida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             bll_DV.InicializarDVs();
 
             MessageBox.Show("Campo restaurado correctamente.");

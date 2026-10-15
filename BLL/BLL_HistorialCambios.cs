@@ -66,7 +66,29 @@ namespace BLL
 
         public void RestaurarCampo(int idUsuario, string campo, string valorAnterior, string usuarioQueRestaura)
         {
-            
+            List<Usuario> usuarios = new DAL_Usuario().Listar();
+            Usuario usuario = usuarios.FirstOrDefault(u => u.Id == idUsuario);
+
+            if (usuario == null || usuario.Eliminado)
+                throw new Exception("El usuario no existe o fue eliminado.");
+
+            if (campo == "Username")
+            {
+                if (string.IsNullOrWhiteSpace(valorAnterior))
+                    throw new Exception("No se puede restaurar un nombre de usuario vacío.");
+
+                bool enUso = usuarios.Any(u =>
+                    !u.Eliminado &&
+                    u.Id != idUsuario &&
+                    u.Username.Trim().Equals(valorAnterior.Trim(), StringComparison.OrdinalIgnoreCase));
+
+                if (enUso)
+                    throw new Exception($"No se puede restaurar: el nombre '{valorAnterior}' ya lo usa otro usuario.");
+            }
+
+            if (campo == "Bloqueado" && idUsuario == BLLUsuario.ID_USUARIO_ADMIN && valorAnterior == "Sí")
+                throw new Exception("No se puede bloquear al usuario administrador del sistema.");
+
             DAL_DV dal_DV = new DAL_DV();
             dal_DV.RestaurarCampo(idUsuario, campo, valorAnterior);
 

@@ -160,6 +160,34 @@ namespace DAL
             return jugador_348LC;
         }
 
+        public List<int> ListarTorneosActivosDelEquipo_348LC(int idEquipo_348LC)
+        {
+            List<int> torneos_348LC = new List<int>();
+
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT I.Id_Torneo
+                         FROM Inscripciones I
+                         JOIN Torneos T ON T.Id_Torneo = I.Id_Torneo
+                         WHERE I.Id_Equipo = @Id_Equipo AND I.Eliminado = 0 AND T.Eliminado = 0";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@Id_Equipo", idEquipo_348LC);
+
+                    using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())
+                    {
+                        while (reader_348LC.Read())
+                            torneos_348LC.Add(Convert.ToInt32(reader_348LC["Id_Torneo"]));
+                    }
+                }
+            }
+
+            return torneos_348LC;
+        }
+
         public List<Inscripcion> ObtenerTodosParaVerificar_348LC()
         {
             List<Inscripcion> lista_348LC = new List<Inscripcion>();

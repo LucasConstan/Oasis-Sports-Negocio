@@ -139,11 +139,11 @@ namespace Oasis_Sports
         private void FrmMenu_Load(object sender, EventArgs e)
         {
             OcultarControles();
+            LanguageManager.GetInstance().TraducirControles(this);
             if (!SessionManager.GetInstance().IsLogged())
                 return;
 
             AplicarPermisos();
-            LanguageManager.GetInstance().TraducirControles(this);
             RegistrarClaves();
         }
 

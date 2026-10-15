@@ -105,6 +105,47 @@ namespace DAL
             return partido_348LC;
         }
 
+        public List<Partido> ListarPorFechaHora_348LC(DateTime fechaPartido_348LC, TimeSpan horaInicio_348LC, int idPartidoExcluir_348LC = 0)
+        {
+            List<Partido> lista_348LC = new List<Partido>();
+
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT Id_Partido, Id_Torneo, Id_EquipoLocal, Id_EquipoVisitante, FechaPartido, HoraInicio, NumeroCancha
+                         FROM Partidos
+                         WHERE FechaPartido = @FechaPartido AND HoraInicio = @HoraInicio
+                         AND Suspendido = 0 AND Eliminado = 0 AND Id_Partido <> @IdPartidoExcluir";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@FechaPartido", fechaPartido_348LC.Date);
+                    cmd_348LC.Parameters.AddWithValue("@HoraInicio", horaInicio_348LC);
+                    cmd_348LC.Parameters.AddWithValue("@IdPartidoExcluir", idPartidoExcluir_348LC);
+
+                    using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())
+                    {
+                        while (reader_348LC.Read())
+                        {
+                            lista_348LC.Add(new Partido
+                            {
+                                Id = Convert.ToInt32(reader_348LC["Id_Partido"]),
+                                IdTorneo = Convert.ToInt32(reader_348LC["Id_Torneo"]),
+                                IdEquipoLocal = Convert.ToInt32(reader_348LC["Id_EquipoLocal"]),
+                                IdEquipoVisitante = Convert.ToInt32(reader_348LC["Id_EquipoVisitante"]),
+                                FechaPartido = Convert.ToDateTime(reader_348LC["FechaPartido"]),
+                                HoraInicio = (TimeSpan)reader_348LC["HoraInicio"],
+                                NumeroCancha = Convert.ToInt32(reader_348LC["NumeroCancha"])
+                            });
+                        }
+                    }
+                }
+            }
+
+            return lista_348LC;
+        }
+
         public int AñadirPartido_348LC(Partido partido_348LC)
         {
             Conexion conexion_348LC = new Conexion();

@@ -350,6 +350,21 @@ namespace DAL
             }
         }
 
+        public bool GrupoPerteneceAOtroGrupo(int grupoId)
+        {
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            {
+                cn.Open();
+
+                string query = "SELECT COUNT(*) FROM PermisoRelacion WHERE HijoId = @HijoId";
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@HijoId", grupoId);
+                    return (int)cmd.ExecuteScalar() > 0;
+                }
+            }
+        }
+
         public bool EsAdministrador(int usuarioId)
         {
             Conexion conexion = new Conexion();

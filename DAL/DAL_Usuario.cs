@@ -121,7 +121,7 @@ namespace DAL
             {
                 cn.Open();
 
-                string query = @"SELECT Id_Usuario, NomUsuario, Contraseña, Bloqueado FROM Usuarios WHERE NomUsuario = @Username";
+                string query = @"SELECT Id_Usuario, NomUsuario, Contraseña, Bloqueado FROM Usuarios WHERE NomUsuario = @Username AND Eliminado = 0";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))
                 {
@@ -154,6 +154,24 @@ namespace DAL
 
                 string query = @"UPDATE Usuarios
                          SET Bloqueado = 1
+                         WHERE Id_Usuario = @Id";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", idUsuario);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void DesbloquearUsuario(int idUsuario)
+        {
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            {
+                cn.Open();
+
+                string query = @"UPDATE Usuarios
+                         SET Bloqueado = 0
                          WHERE Id_Usuario = @Id";
 
                 using (SqlCommand cmd = new SqlCommand(query, cn))

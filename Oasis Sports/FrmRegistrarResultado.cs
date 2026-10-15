@@ -1,5 +1,6 @@
 ﻿using BLL;
 using Entidades;
+using Servicios;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,11 +13,12 @@ using System.Windows.Forms;
 
 namespace Oasis_Sports
 {
-    public partial class FrmRegistrarResultado : BaseForm
+    public partial class FrmRegistrarResultado : BaseForm, IObserverIdioma
     {
         public FrmRegistrarResultado()
         {
             InitializeComponent();
+            LanguageManager.GetInstance().Agregar(this);
         }
 
         BLL_Torneo bllTorneo_348LC = new BLL_Torneo();
@@ -25,9 +27,48 @@ namespace Oasis_Sports
 
         private void FrmRegistrarResultado_Load(object sender, EventArgs e)
         {
+            RegistrarClaves();
+            LanguageManager.GetInstance().TraducirControles(this);
+
             cmbTorneo.DisplayMember = "NombreTorneo";
             cmbTorneo.ValueMember = "Id";
             cmbTorneo.DataSource = bllTorneo_348LC.Listar_348LC();
+        }
+
+        public void ActualizarIdioma()
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new Action(() => LanguageManager.GetInstance().TraducirControles(this)));
+            else
+                LanguageManager.GetInstance().TraducirControles(this);
+        }
+
+        private void RegistrarClaves()
+        {
+            int idIdioma = LanguageManager.GetInstance().IdIdiomaActual;
+            BLL_Traduccion bll = new BLL_Traduccion();
+            List<string> clavesExistentes = bll.ObtenerTodasLasClaves();
+
+            foreach (Control c in this.Controls)
+                RegistrarRecursivo(c, idIdioma, bll, clavesExistentes);
+        }
+
+        private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll, List<string> clavesExistentes)
+        {
+            if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
+                && !clavesExistentes.Contains(c.Name))
+            {
+                bll.GuardarOActualizar(new Traduccion
+                {
+                    IdIdioma = idIdioma,
+                    Clave = c.Name,
+                    Texto = c.Text
+                });
+                clavesExistentes.Add(c.Name);
+            }
+
+            foreach (Control hijo in c.Controls)
+                RegistrarRecursivo(hijo, idIdioma, bll, clavesExistentes);
         }
 
         private void CargarGrilla_348LC()
@@ -95,6 +136,16 @@ namespace Oasis_Sports
                     bllResultado_348LC.RegistrarResultado_348LC(idPartidoSeleccionado_348LC, golesLocal_348LC, golesVisitante_348LC);
                     MessageBox.Show("Resultado registrado correctamente.");
                 }
+
+                BLL_Evento bllEvento = new BLL_Evento();
+                bllEvento.RegistrarEvento(new Evento()
+                {
+                    Usuario = SessionManager.GetInstance().Usuario.Username,
+                    Modulo = "Registrar Resultado",
+                    Descripcion = chkSuspendido.Checked ? "Partido suspendido" : "Nuevo resultado",
+                    Fecha = DateTime.Now,
+                    Criticidad = 4
+                });
 
                 CargarGrilla_348LC();
                 idPartidoSeleccionado_348LC = 0;

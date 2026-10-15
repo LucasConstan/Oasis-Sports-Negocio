@@ -139,10 +139,14 @@ namespace Oasis_Sports
                 BLL_Permisos bllPermisos = new BLL_Permisos();
 
 
-                if (!bLL_DV.VerificarIntegridad() && bllPermisos.EsAdministrador(user.Id))
+                List<string> tablasAlteradas = bLL_DV.ObtenerTablasAlteradas();
+                bool esAdministrador = bllPermisos.EsAdministrador(user.Id);
+
+                if (tablasAlteradas.Count > 0 && esAdministrador)
                 {
                     DialogResult resultado = MessageBox.Show(
-                        "Se detectó una alteración en los datos.\n¿Desea recalcular los dígitos verificadores?",
+                        "Se detectó una alteración en las tablas: " + string.Join(", ", tablasAlteradas) +
+                        ".\n¿Desea recalcular los dígitos verificadores?",
                         "Error de integridad",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning);
@@ -150,7 +154,7 @@ namespace Oasis_Sports
                     if (resultado == DialogResult.Yes)
                     {
 
-                        bLL_DV.InicializarDVs();
+                        bLL_DV.RecalcularTablas(tablasAlteradas);
 
                         MessageBox.Show(
                             "Dígitos verificadores recalculados correctamente.",
@@ -165,7 +169,7 @@ namespace Oasis_Sports
                     }
                 }
 
-                else if (!bLL_DV.VerificarIntegridad() && !bllPermisos.EsAdministrador(user.Id))
+                else if (tablasAlteradas.Count > 0)
                 {
                     MessageBox.Show(
                            "No se puede ingresar al sistema en estos momentos. Contacte a un administrador.",

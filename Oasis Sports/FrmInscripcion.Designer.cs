@@ -43,6 +43,8 @@
             btnVolver = new Button();
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
+            lblEquiposIns = new Button();
+            lblJugadoresIns = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvJugadoresEquipo).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvEquiposInscriptos).BeginInit();
             groupBox1.SuspendLayout();
@@ -108,7 +110,7 @@
             btnAgregarEquipo.Name = "btnAgregarEquipo";
             btnAgregarEquipo.Size = new Size(209, 54);
             btnAgregarEquipo.TabIndex = 6;
-            btnAgregarEquipo.Text = "AGREGAR EQUIPO";
+            btnAgregarEquipo.Text = "Agregar Equipo";
             btnAgregarEquipo.UseVisualStyleBackColor = true;
             btnAgregarEquipo.Click += btnAgregarEquipo_Click;
             // 
@@ -118,7 +120,7 @@
             btnQuitarEquipo.Name = "btnQuitarEquipo";
             btnQuitarEquipo.Size = new Size(209, 53);
             btnQuitarEquipo.TabIndex = 7;
-            btnQuitarEquipo.Text = "QUITAR EQUIPO";
+            btnQuitarEquipo.Text = "Quitar Equipo";
             btnQuitarEquipo.UseVisualStyleBackColor = true;
             btnQuitarEquipo.Click += btnQuitarEquipo_Click;
             // 
@@ -128,7 +130,7 @@
             btnQuitarJugador.Name = "btnQuitarJugador";
             btnQuitarJugador.Size = new Size(209, 53);
             btnQuitarJugador.TabIndex = 9;
-            btnQuitarJugador.Text = "QUITAR JUGADOR";
+            btnQuitarJugador.Text = "Quitar Jugador";
             btnQuitarJugador.UseVisualStyleBackColor = true;
             btnQuitarJugador.Click += btnQuitarJugador_Click;
             // 
@@ -138,7 +140,7 @@
             btnAgregarJugador.Name = "btnAgregarJugador";
             btnAgregarJugador.Size = new Size(209, 54);
             btnAgregarJugador.TabIndex = 8;
-            btnAgregarJugador.Text = "AGREGAR JUGADOR";
+            btnAgregarJugador.Text = "Agregar Jugador";
             btnAgregarJugador.UseVisualStyleBackColor = true;
             btnAgregarJugador.Click += btnAgregarJugador_Click;
             // 
@@ -195,11 +197,33 @@
             groupBox2.TabIndex = 14;
             groupBox2.TabStop = false;
             // 
+            // lblEquiposIns
+            // 
+            lblEquiposIns.Location = new Point(31, 119);
+            lblEquiposIns.Name = "lblEquiposIns";
+            lblEquiposIns.Size = new Size(209, 54);
+            lblEquiposIns.TabIndex = 8;
+            lblEquiposIns.Text = "Equipos";
+            lblEquiposIns.UseVisualStyleBackColor = true;
+            lblEquiposIns.Click += lblEquiposIns_Click;
+            // 
+            // lblJugadoresIns
+            // 
+            lblJugadoresIns.Location = new Point(31, 192);
+            lblJugadoresIns.Name = "lblJugadoresIns";
+            lblJugadoresIns.Size = new Size(209, 54);
+            lblJugadoresIns.TabIndex = 15;
+            lblJugadoresIns.Text = "Jugadores";
+            lblJugadoresIns.UseVisualStyleBackColor = true;
+            lblJugadoresIns.Click += lblJugadoresIns_Click;
+            // 
             // FrmInscripcion
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1386, 751);
+            Controls.Add(lblJugadoresIns);
+            Controls.Add(lblEquiposIns);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Controls.Add(btnVolver);
@@ -235,5 +259,7 @@
         private Button btnVolver;
         private GroupBox groupBox1;
         private GroupBox groupBox2;
+        private Button lblEquiposIns;
+        private Button lblJugadoresIns;
     }
 }

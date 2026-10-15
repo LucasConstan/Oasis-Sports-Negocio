@@ -124,7 +124,16 @@ namespace Oasis_Sports
                 Password = password 
             };
 
-            bllUsuario.AñadirUsuario(usuario);
+            try
+            {
+                bllUsuario.AñadirUsuario(usuario);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             BLL_Evento bllEvento = new BLL_Evento();
             
             
@@ -172,22 +181,22 @@ namespace Oasis_Sports
             }
 
 
-            
-            string usuarioLogueado = SessionManager.GetInstance().Usuario.Username;
-            if (txtUsuario.Text.Trim().Equals(usuarioLogueado, StringComparison.OrdinalIgnoreCase))
+            DialogResult result = MessageBox.Show($"¿Está seguro que desea eliminar al usuario {txtUsuario.Text}?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result != DialogResult.Yes)
+                return;
+
+            try
             {
-                MessageBox.Show("No puedes eliminar al usuario con el que estás logueado actualmente.", "Seguridad", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                bllUsuario.EliminarUsuario(idUsuarioSeleccionado);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Operación no permitida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            DialogResult result = MessageBox.Show($"¿Está seguro que desea eliminar al usuario {txtUsuario.Text}?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result == DialogResult.Yes)
-            {
-                bllUsuario.EliminarUsuario(idUsuarioSeleccionado);
-              
-                MessageBox.Show("El Usuario fue eliminado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                bLL_DV.InicializarDVs();
-            }
+            MessageBox.Show("El Usuario fue eliminado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            bLL_DV.InicializarDVs();
 
             BLL_Evento bllEvento = new BLL_Evento();
 
@@ -254,7 +263,15 @@ namespace Oasis_Sports
                 Password = password
             };
 
-            bllUsuario.ModificarUsuario(idUsuarioSeleccionado, usuario);
+            try
+            {
+                bllUsuario.ModificarUsuario(idUsuarioSeleccionado, usuario);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             BLL_Evento bllEvento = new BLL_Evento();
             bllEvento.RegistrarEvento(new Evento()
@@ -277,6 +294,37 @@ namespace Oasis_Sports
             FrmHistorialCambios frm = new FrmHistorialCambios(idUsuarioSeleccionado, usuario.Username);
             frm.ShowDialog();
             
+        }
+
+        private void btnDesbloquear_Click(object sender, EventArgs e)
+        {
+            if (idUsuarioSeleccionado == 0)
+            {
+                MessageBox.Show("Seleccione un usuario en la grilla.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                bllUsuario.DesbloquearUsuario(idUsuarioSeleccionado);
+
+                BLL_Evento bllEvento = new BLL_Evento();
+                bllEvento.RegistrarEvento(new Evento()
+                {
+                    Usuario = SessionManager.GetInstance().Usuario.Username,
+                    Modulo = "Usuarios",
+                    Descripcion = "Desbloqueo de usuario: " + txtUsuario.Text,
+                    Fecha = DateTime.Now,
+                    Criticidad = 2
+                });
+
+                dataGridView1.DataSource = bllUsuario.Listar();
+                MessageBox.Show("El usuario fue desbloqueado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void FrmGestionUsuarios_FormClosing(object sender, FormClosingEventArgs e)

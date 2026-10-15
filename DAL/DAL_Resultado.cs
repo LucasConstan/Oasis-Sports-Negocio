@@ -26,7 +26,8 @@ namespace DAL
              JOIN Torneos T ON T.Id_Torneo = P.Id_Torneo
              JOIN Equipos EL ON EL.Id_Equipo = P.Id_EquipoLocal
              JOIN Equipos EV ON EV.Id_Equipo = P.Id_EquipoVisitante
-             WHERE P.Id_Torneo = @Id_Torneo AND P.Eliminado = 0";
+             WHERE P.Id_Torneo = @Id_Torneo AND P.Eliminado = 0
+             AND P.Suspendido = 0 AND P.GolesEquipoLocal IS NULL AND P.GolesEquipoVisitante IS NULL";
 
             using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
             {

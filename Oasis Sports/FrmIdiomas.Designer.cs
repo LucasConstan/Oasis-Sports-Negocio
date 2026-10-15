@@ -18,7 +18,7 @@ namespace Oasis_Sports
             txtClave = new TextBox();
             txtTexto = new TextBox();
             txtNuevoIdioma = new TextBox();
-            btnGuardar = new Button();
+            btnGuardarTraduccion = new Button();
             btnNuevoIdioma = new Button();
             btnCambiarIdioma = new Button();
             lblIdiomaActivo = new Label();
@@ -71,16 +71,16 @@ namespace Oasis_Sports
             txtNuevoIdioma.Size = new Size(190, 29);
             txtNuevoIdioma.TabIndex = 12;
             // 
-            // btnGuardar
+            // btnGuardarTraduccion
             // 
-            btnGuardar.BackColor = Color.Transparent;
-            btnGuardar.Location = new Point(246, 47);
-            btnGuardar.Name = "btnGuardar";
-            btnGuardar.Size = new Size(130, 58);
-            btnGuardar.TabIndex = 10;
-            btnGuardar.Text = "Guardar traducción";
-            btnGuardar.UseVisualStyleBackColor = false;
-            btnGuardar.Click += btnGuardar_Click;
+            btnGuardarTraduccion.BackColor = Color.Transparent;
+            btnGuardarTraduccion.Location = new Point(246, 47);
+            btnGuardarTraduccion.Name = "btnGuardarTraduccion";
+            btnGuardarTraduccion.Size = new Size(130, 58);
+            btnGuardarTraduccion.TabIndex = 10;
+            btnGuardarTraduccion.Text = "Guardar traducción";
+            btnGuardarTraduccion.UseVisualStyleBackColor = false;
+            btnGuardarTraduccion.Click += btnGuardar_Click;
             // 
             // btnNuevoIdioma
             // 
@@ -162,7 +162,7 @@ namespace Oasis_Sports
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(btnGuardar);
+            groupBox1.Controls.Add(btnGuardarTraduccion);
             groupBox1.Controls.Add(txtTexto);
             groupBox1.Controls.Add(txtClave);
             groupBox1.Location = new Point(20, 155);
@@ -203,7 +203,7 @@ namespace Oasis_Sports
         private TextBox txtClave;
         private TextBox txtTexto;
         private TextBox txtNuevoIdioma;
-        private Button btnGuardar;
+        private Button btnGuardarTraduccion;
         private Button btnNuevoIdioma;
         private Button btnCambiarIdioma;
         private Label lblIdiomaActivo;

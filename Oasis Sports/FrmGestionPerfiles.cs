@@ -179,8 +179,15 @@ namespace Oasis_Sports
             }
 
 
-            permisoBLL.AsignarPermiso(usuario.Id, permiso.Id);
-            CargarPermisosAsignados(usuario.Id);
+            try
+            {
+                permisoBLL.AsignarPermiso(usuario.Id, permiso.Id);
+                CargarPermisosAsignados(usuario.Id);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void btnQuitar_Click(object sender, EventArgs e)
@@ -205,9 +212,15 @@ namespace Oasis_Sports
             }
 
 
-            permisoBLL.QuitarPermisoAUsuario(usuario.Id, permiso.Id);
-
-            CargarPermisosAsignados(usuario.Id);
+            try
+            {
+                permisoBLL.QuitarPermisoAUsuario(usuario.Id, permiso.Id);
+                CargarPermisosAsignados(usuario.Id);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Operación no permitida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)

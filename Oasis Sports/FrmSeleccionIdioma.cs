@@ -46,14 +46,16 @@ namespace Oasis_Sports
         {
             int idIdioma = LanguageManager.GetInstance().IdIdiomaActual;
             BLL_Traduccion bll = new BLL_Traduccion();
+            List<string> clavesExistentes = bll.ObtenerTodasLasClaves();
 
             foreach (Control c in this.Controls)
-                RegistrarRecursivo(c, idIdioma, bll);
+                RegistrarRecursivo(c, idIdioma, bll, clavesExistentes);
         }
 
-        private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll)
+        private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll, List<string> clavesExistentes)
         {
-            if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text))
+            if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
+                && !clavesExistentes.Contains(c.Name))
             {
                 bll.GuardarOActualizar(new Traduccion
                 {
@@ -61,10 +63,11 @@ namespace Oasis_Sports
                     Clave = c.Name,
                     Texto = c.Text
                 });
+                clavesExistentes.Add(c.Name);
             }
 
             foreach (Control hijo in c.Controls)
-                RegistrarRecursivo(hijo, idIdioma, bll);
+                RegistrarRecursivo(hijo, idIdioma, bll, clavesExistentes);
         }
 
 
