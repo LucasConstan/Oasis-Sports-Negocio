@@ -54,6 +54,8 @@ namespace BLL
             if (!new BLL_Torneo().VerificarIntegridad_348LC()) tablas.Add("Torneos");
             if (!new BLL_Inscripcion().VerificarIntegridad_348LC()) tablas.Add("Inscripciones");
             if (!new BLL_Partido().VerificarIntegridad_348LC()) tablas.Add("Partidos");
+            if (!new BLL_Profesor().VerificarIntegridad_348LC()) tablas.Add("Profesores");
+            if (!new BLL_Participante().VerificarIntegridad_348LC()) tablas.Add("Participantes");
 
             return tablas;
         }
@@ -70,6 +72,8 @@ namespace BLL
                     case "Torneos": new BLL_Torneo().RecalcularTodos_348LC(); break;
                     case "Inscripciones": new BLL_Inscripcion().RecalcularTodos_348LC(); break;
                     case "Partidos": new BLL_Partido().RecalcularTodos_348LC(); break;
+                    case "Profesores": new BLL_Profesor().RecalcularTodos_348LC(); break;
+                    case "Participantes": new BLL_Participante().RecalcularTodos_348LC(); break;
                 }
             }
         }

@@ -244,6 +244,20 @@ namespace Oasis_Sports
             this.Hide();
         }
 
+        private void pROFESORESToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmProfesores frmProfesores = new FrmProfesores();
+            frmProfesores.Show();
+            this.Hide();
+        }
+
+        private void pARTICIPANTESToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmParticipantes frmParticipantes = new FrmParticipantes();
+            frmParticipantes.Show();
+            this.Hide();
+        }
+
         private void gESTIONDERESERVASToolStripMenuItem_Click(object sender, EventArgs e)
         {
 

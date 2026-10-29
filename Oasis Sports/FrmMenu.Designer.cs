@@ -28,6 +28,8 @@ namespace Oasis_Sports
             mAESTROSToolStripMenuItem = new ToolStripMenuItem();
             eQUIPOSToolStripMenuItem = new ToolStripMenuItem();
             jUGADORESToolStripMenuItem = new ToolStripMenuItem();
+            pROFESORESToolStripMenuItem = new ToolStripMenuItem();
+            pARTICIPANTESToolStripMenuItem = new ToolStripMenuItem();
             gESTIONDERESERVASToolStripMenuItem = new ToolStripMenuItem();
             tORNEOSToolStripMenuItem = new ToolStripMenuItem();
             aSIGNAREQUIPOSToolStripMenuItem = new ToolStripMenuItem();
@@ -112,7 +114,7 @@ namespace Oasis_Sports
             // 
             // mAESTROSToolStripMenuItem
             // 
-            mAESTROSToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { eQUIPOSToolStripMenuItem, jUGADORESToolStripMenuItem });
+            mAESTROSToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { eQUIPOSToolStripMenuItem, jUGADORESToolStripMenuItem, pROFESORESToolStripMenuItem, pARTICIPANTESToolStripMenuItem });
             mAESTROSToolStripMenuItem.Font = new Font("Times New Roman", 9.75F);
             mAESTROSToolStripMenuItem.Name = "mAESTROSToolStripMenuItem";
             mAESTROSToolStripMenuItem.Size = new Size(87, 20);
@@ -131,6 +133,20 @@ namespace Oasis_Sports
             jUGADORESToolStripMenuItem.Size = new Size(146, 22);
             jUGADORESToolStripMenuItem.Text = "JUGADORES";
             jUGADORESToolStripMenuItem.Click += jUGADORESToolStripMenuItem_Click;
+            //
+            // pROFESORESToolStripMenuItem
+            //
+            pROFESORESToolStripMenuItem.Name = "pROFESORESToolStripMenuItem";
+            pROFESORESToolStripMenuItem.Size = new Size(146, 22);
+            pROFESORESToolStripMenuItem.Text = "PROFESORES";
+            pROFESORESToolStripMenuItem.Click += pROFESORESToolStripMenuItem_Click;
+            //
+            // pARTICIPANTESToolStripMenuItem
+            //
+            pARTICIPANTESToolStripMenuItem.Name = "pARTICIPANTESToolStripMenuItem";
+            pARTICIPANTESToolStripMenuItem.Size = new Size(146, 22);
+            pARTICIPANTESToolStripMenuItem.Text = "PARTICIPANTES";
+            pARTICIPANTESToolStripMenuItem.Click += pARTICIPANTESToolStripMenuItem_Click;
             // 
             // gESTIONDERESERVASToolStripMenuItem
             // 
@@ -242,6 +258,8 @@ namespace Oasis_Sports
         private ToolStripMenuItem mAESTROSToolStripMenuItem;
         private ToolStripMenuItem eQUIPOSToolStripMenuItem;
         private ToolStripMenuItem jUGADORESToolStripMenuItem;
+        private ToolStripMenuItem pROFESORESToolStripMenuItem;
+        private ToolStripMenuItem pARTICIPANTESToolStripMenuItem;
         private ToolStripMenuItem tORNEOSToolStripMenuItem;
         private ToolStripMenuItem aSIGNAREQUIPOSToolStripMenuItem;
         private ToolStripMenuItem oRGANIZARPARTIDOSToolStripMenuItem;
