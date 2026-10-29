@@ -39,12 +39,16 @@ namespace Oasis_Sports
             cREARIDIOMAToolStripMenuItem = new ToolStripMenuItem();
             sALIRToolStripMenuItem = new ToolStripMenuItem();
             rEGISTRARRESULTADOSToolStripMenuItem = new ToolStripMenuItem();
+            gESTIONDECLASESToolStripMenuItem = new ToolStripMenuItem();
+            cREARCLASEToolStripMenuItem = new ToolStripMenuItem();
+            iNSCRIBIRPARTICIPANTEToolStripMenuItem = new ToolStripMenuItem();
+            rEGISTRARPAGOToolStripMenuItem = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { uSUARIOToolStripMenuItem, bitacoraToolStripMenuItem, mAESTROSToolStripMenuItem, gESTIONDERESERVASToolStripMenuItem, gESTIONDEIDIOMASToolStripMenuItem, sALIRToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { uSUARIOToolStripMenuItem, bitacoraToolStripMenuItem, mAESTROSToolStripMenuItem, gESTIONDERESERVASToolStripMenuItem, gESTIONDECLASESToolStripMenuItem, gESTIONDEIDIOMASToolStripMenuItem, sALIRToolStripMenuItem });
             menuStrip1.Location = new Point(2, 2);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(796, 24);
@@ -217,7 +221,37 @@ namespace Oasis_Sports
             rEGISTRARRESULTADOSToolStripMenuItem.Size = new Size(220, 22);
             rEGISTRARRESULTADOSToolStripMenuItem.Text = "REGISTRAR RESULTADOS";
             rEGISTRARRESULTADOSToolStripMenuItem.Click += rEGISTRARRESULTADOSToolStripMenuItem_Click;
-            // 
+            //
+            // gESTIONDECLASESToolStripMenuItem
+            //
+            gESTIONDECLASESToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { cREARCLASEToolStripMenuItem, iNSCRIBIRPARTICIPANTEToolStripMenuItem, rEGISTRARPAGOToolStripMenuItem });
+            gESTIONDECLASESToolStripMenuItem.Font = new Font("Times New Roman", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            gESTIONDECLASESToolStripMenuItem.Name = "gESTIONDECLASESToolStripMenuItem";
+            gESTIONDECLASESToolStripMenuItem.Size = new Size(140, 20);
+            gESTIONDECLASESToolStripMenuItem.Text = "GESTION DE CLASES";
+            gESTIONDECLASESToolStripMenuItem.Visible = false;
+            //
+            // cREARCLASEToolStripMenuItem
+            //
+            cREARCLASEToolStripMenuItem.Name = "cREARCLASEToolStripMenuItem";
+            cREARCLASEToolStripMenuItem.Size = new Size(230, 22);
+            cREARCLASEToolStripMenuItem.Text = "CREAR CLASE";
+            cREARCLASEToolStripMenuItem.Click += cREARCLASEToolStripMenuItem_Click;
+            //
+            // iNSCRIBIRPARTICIPANTEToolStripMenuItem
+            //
+            iNSCRIBIRPARTICIPANTEToolStripMenuItem.Name = "iNSCRIBIRPARTICIPANTEToolStripMenuItem";
+            iNSCRIBIRPARTICIPANTEToolStripMenuItem.Size = new Size(230, 22);
+            iNSCRIBIRPARTICIPANTEToolStripMenuItem.Text = "INSCRIBIR PARTICIPANTE";
+            iNSCRIBIRPARTICIPANTEToolStripMenuItem.Click += iNSCRIBIRPARTICIPANTEToolStripMenuItem_Click;
+            //
+            // rEGISTRARPAGOToolStripMenuItem
+            //
+            rEGISTRARPAGOToolStripMenuItem.Name = "rEGISTRARPAGOToolStripMenuItem";
+            rEGISTRARPAGOToolStripMenuItem.Size = new Size(230, 22);
+            rEGISTRARPAGOToolStripMenuItem.Text = "REGISTRAR PAGO";
+            rEGISTRARPAGOToolStripMenuItem.Click += rEGISTRARPAGOToolStripMenuItem_Click;
+            //
             // FrmMenu
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -264,5 +298,9 @@ namespace Oasis_Sports
         private ToolStripMenuItem aSIGNAREQUIPOSToolStripMenuItem;
         private ToolStripMenuItem oRGANIZARPARTIDOSToolStripMenuItem;
         private ToolStripMenuItem rEGISTRARRESULTADOSToolStripMenuItem;
+        private ToolStripMenuItem gESTIONDECLASESToolStripMenuItem;
+        private ToolStripMenuItem cREARCLASEToolStripMenuItem;
+        private ToolStripMenuItem iNSCRIBIRPARTICIPANTEToolStripMenuItem;
+        private ToolStripMenuItem rEGISTRARPAGOToolStripMenuItem;
     }
 }

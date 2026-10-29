@@ -167,6 +167,7 @@ namespace Oasis_Sports
             gESTIONDEIDIOMASToolStripMenuItem.Visible = false;
             bITACORADECAMBIOSToolStripMenuItem.Visible = false;
             mAESTROSToolStripMenuItem.Visible = false;
+            gESTIONDECLASESToolStripMenuItem.Visible = false;
 
         }
 
@@ -181,6 +182,7 @@ namespace Oasis_Sports
                 gESTIONDEIDIOMASToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "GID");
                 bITACORADECAMBIOSToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "BDC");
                 mAESTROSToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "MAE");
+                gESTIONDECLASESToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "GCL");
 
 
                 bitacoraToolStripMenuItem.Visible = true;
@@ -288,6 +290,27 @@ namespace Oasis_Sports
         {
             FrmRegistrarResultado frmRegistrarResultado = new FrmRegistrarResultado();
             frmRegistrarResultado.Show();
+            this.Close();
+        }
+
+        private void cREARCLASEToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmCrearClase frmCrearClase = new FrmCrearClase();
+            frmCrearClase.Show();
+            this.Close();
+        }
+
+        private void iNSCRIBIRPARTICIPANTEToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmInscribirParticipante frmInscribirParticipante = new FrmInscribirParticipante();
+            frmInscribirParticipante.Show();
+            this.Close();
+        }
+
+        private void rEGISTRARPAGOToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmRegistrarPago frmRegistrarPago = new FrmRegistrarPago();
+            frmRegistrarPago.Show();
             this.Close();
         }
     }

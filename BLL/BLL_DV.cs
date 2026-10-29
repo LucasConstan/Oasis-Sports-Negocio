@@ -56,6 +56,9 @@ namespace BLL
             if (!new BLL_Partido().VerificarIntegridad_348LC()) tablas.Add("Partidos");
             if (!new BLL_Profesor().VerificarIntegridad_348LC()) tablas.Add("Profesores");
             if (!new BLL_Participante().VerificarIntegridad_348LC()) tablas.Add("Participantes");
+            if (!new BLL_Clase().VerificarIntegridad_348LC()) tablas.Add("Clases");
+            if (!new BLL_Matricula().VerificarIntegridad_348LC()) tablas.Add("Matriculas");
+            if (!new BLL_Pago().VerificarIntegridad_348LC()) tablas.Add("Pagos");
 
             return tablas;
         }
@@ -74,6 +77,9 @@ namespace BLL
                     case "Partidos": new BLL_Partido().RecalcularTodos_348LC(); break;
                     case "Profesores": new BLL_Profesor().RecalcularTodos_348LC(); break;
                     case "Participantes": new BLL_Participante().RecalcularTodos_348LC(); break;
+                    case "Clases": new BLL_Clase().RecalcularTodos_348LC(); break;
+                    case "Matriculas": new BLL_Matricula().RecalcularTodos_348LC(); break;
+                    case "Pagos": new BLL_Pago().RecalcularTodos_348LC(); break;
                 }
             }
         }
