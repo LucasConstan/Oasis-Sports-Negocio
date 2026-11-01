@@ -11,27 +11,100 @@ namespace DAL
 {
     public class DAL_Permisos
     {
-        public ComponentePermiso ObtenerArbolPermiso(int permisoId)
+        public List<ComponentePermiso> ObtenerTodos()
         {
-            ComponentePermiso permiso = ObtenerPermisoPorId(permisoId);
+            List<ComponentePermiso> permisos = new List<ComponentePermiso>();
 
-            if (permiso is GrupoPermisos grupo)
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
-                List<int> hijosIds = ObtenerHijosIds(permisoId);
+                cn.Open();
 
-                foreach (int hijoId in hijosIds)
+                string query = "SELECT Id, Nombre, Codigo, EsGrupo FROM Permiso ORDER BY EsGrupo DESC, Codigo";
+
+                using (SqlCommand comando = new SqlCommand(query, cn))
+                using (SqlDataReader reader = comando.ExecuteReader())
                 {
-                    ComponentePermiso hijo = ObtenerArbolPermiso(hijoId);
-                    grupo.Agregar(hijo);
+                    while (reader.Read())
+                        permisos.Add(CrearComponente(reader));
                 }
             }
 
-            return permiso;
+            return permisos;
         }
 
-        public List<ComponentePermiso> ObtenerPermisosDeUsuario(int usuarioId)
+        public ComponentePermiso ObtenerArbolPermiso(int permisoId)
         {
-            List<ComponentePermiso> permisos = new List<ComponentePermiso>();
+            return ArmarArbol(permisoId, ObtenerTodos(), ObtenerRelaciones());
+        }
+
+        public List<ComponentePermiso> ObtenerArboles()
+        {
+            List<ComponentePermiso> permisos = ObtenerTodos();
+            List<(int PadreId, int HijoId)> relaciones = ObtenerRelaciones();
+
+            return permisos.Select(p => ArmarArbol(p.Id, permisos, relaciones)).ToList();
+        }
+
+        private ComponentePermiso ArmarArbol(int permisoId, List<ComponentePermiso> permisos, List<(int PadreId, int HijoId)> relaciones)
+        {
+            ComponentePermiso datos = permisos.FirstOrDefault(p => p.Id == permisoId);
+
+            if (datos == null)
+                throw new Exception("Permiso no encontrado.");
+
+            if (datos is PermisoSimple)
+                return new PermisoSimple { Id = datos.Id, Nombre = datos.Nombre, Codigo = datos.Codigo };
+
+            GrupoPermisos grupo = new GrupoPermisos { Id = datos.Id, Nombre = datos.Nombre, Codigo = datos.Codigo };
+
+            IEnumerable<ComponentePermiso> hijos = relaciones
+                .Where(r => r.PadreId == permisoId)
+                .Select(r => permisos.First(p => p.Id == r.HijoId))
+                .OrderBy(p => p is PermisoSimple)
+                .ThenBy(p => p.Codigo);
+
+            foreach (ComponentePermiso hijo in hijos)
+                grupo.Agregar(ArmarArbol(hijo.Id, permisos, relaciones));
+
+            return grupo;
+        }
+
+        private List<(int PadreId, int HijoId)> ObtenerRelaciones()
+        {
+            List<(int PadreId, int HijoId)> relaciones = new List<(int PadreId, int HijoId)>();
+
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            {
+                cn.Open();
+
+                string query = "SELECT PadreId, HijoId FROM PermisoRelacion";
+
+                using (SqlCommand comando = new SqlCommand(query, cn))
+                using (SqlDataReader reader = comando.ExecuteReader())
+                {
+                    while (reader.Read())
+                        relaciones.Add((Convert.ToInt32(reader["PadreId"]), Convert.ToInt32(reader["HijoId"])));
+                }
+            }
+
+            return relaciones;
+        }
+
+        private ComponentePermiso CrearComponente(SqlDataReader reader)
+        {
+            int id = Convert.ToInt32(reader["Id"]);
+            string nombre = reader["Nombre"].ToString();
+            string codigo = reader["Codigo"].ToString();
+
+            if (Convert.ToBoolean(reader["EsGrupo"]))
+                return new GrupoPermisos { Id = id, Nombre = nombre, Codigo = codigo };
+
+            return new PermisoSimple { Id = id, Nombre = nombre, Codigo = codigo };
+        }
+
+        public GrupoPermisos ObtenerPerfilDeUsuario(int usuarioId)
+        {
+            object perfilId;
 
             using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
@@ -42,312 +115,199 @@ namespace DAL
                 using (SqlCommand comando = new SqlCommand(query, cn))
                 {
                     comando.Parameters.AddWithValue("@UsuarioId", usuarioId);
-
-                    using (SqlDataReader reader = comando.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int permisoId = Convert.ToInt32(reader["PermisoId"]);
-                            permisos.Add(ObtenerArbolPermiso(permisoId));
-                        }
-                    }
+                    perfilId = comando.ExecuteScalar();
                 }
             }
 
-            return permisos;
+            if (perfilId == null || perfilId == DBNull.Value)
+                return null;
+
+            return ObtenerArbolPermiso(Convert.ToInt32(perfilId)) as GrupoPermisos;
         }
 
-        private ComponentePermiso ObtenerPermisoPorId(int permisoId)
+        public void AsignarPerfil(int usuarioId, int perfilId)
         {
             using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
                 cn.Open();
 
-                string query = "SELECT Id, Nombre, Codigo, EsGrupo FROM Permiso WHERE Id = @Id";
-
-                using (SqlCommand comando = new SqlCommand(query, cn))
-                {
-                    comando.Parameters.AddWithValue("@Id", permisoId);
-
-                    using (SqlDataReader reader = comando.ExecuteReader())
-                    {
-                        if (!reader.Read())
-                            throw new Exception("Permiso no encontrado.");
-
-                        bool esGrupo = Convert.ToBoolean(reader["EsGrupo"]);
-
-                        if (esGrupo)
-                        {
-                            return new GrupoPermisos
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Nombre = reader["Nombre"].ToString(),
-                                Codigo = reader["Codigo"]?.ToString()
-                            };
-                        }
-
-                        return new PermisoSimple
-                        {
-                            Id = Convert.ToInt32(reader["Id"]),
-                            Nombre = reader["Nombre"].ToString(),
-                            Codigo = reader["Codigo"].ToString()
-                        };
-                    }
-                }
-            }
-        }
-
-        private List<int> ObtenerHijosIds(int padreId)
-        {
-            List<int> hijos = new List<int>();
-
-            using (SqlConnection cn = new Conexion().ObtenerConexion())
-            {
-                cn.Open();
-
-                string query = "SELECT HijoId FROM PermisoRelacion WHERE PadreId = @PadreId";
-
-                using (SqlCommand comando = new SqlCommand(query, cn))
-                {
-                    comando.Parameters.AddWithValue("@PadreId", padreId);
-
-                    using (SqlDataReader reader = comando.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            hijos.Add(Convert.ToInt32(reader["HijoId"]));
-                        }
-                    }
-                }
-            }
-
-            return hijos;
-        }
-
-        public void AsignarPermiso(int usuarioId, int permisoId)
-        {
-            using (SqlConnection cn = new Conexion().ObtenerConexion())
-            {
-                cn.Open();
-
-                string query = @"IF NOT EXISTS (SELECT 1 FROM UsuarioPermiso 
-                WHERE UsuarioId = @UsuarioId  AND PermisoId = @PermisoId)
-            BEGIN
-                INSERT INTO UsuarioPermiso (UsuarioId, PermisoId)
-                VALUES (@UsuarioId, @PermisoId)
-            END";
+                string query = @"UPDATE UsuarioPermiso SET PermisoId = @PermisoId WHERE UsuarioId = @UsuarioId;
+                IF @@ROWCOUNT = 0
+                    INSERT INTO UsuarioPermiso (UsuarioId, PermisoId) VALUES (@UsuarioId, @PermisoId);";
 
                 using (SqlCommand comando = new SqlCommand(query, cn))
                 {
                     comando.Parameters.AddWithValue("@UsuarioId", usuarioId);
-                    comando.Parameters.AddWithValue("@PermisoId", permisoId);
-
+                    comando.Parameters.AddWithValue("@PermisoId", perfilId);
                     comando.ExecuteNonQuery();
                 }
             }
         }
 
-        public void QuitarPermiso(int usuarioId, int permisoId)
+        public void QuitarPerfil(int usuarioId)
         {
             using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
                 cn.Open();
 
-                string query = @" DELETE FROM UsuarioPermiso WHERE UsuarioId = @UsuarioId AND PermisoId = @PermisoId";
+                string query = "DELETE FROM UsuarioPermiso WHERE UsuarioId = @UsuarioId";
 
                 using (SqlCommand comando = new SqlCommand(query, cn))
                 {
                     comando.Parameters.AddWithValue("@UsuarioId", usuarioId);
-                    comando.Parameters.AddWithValue("@PermisoId", permisoId);
-
                     comando.ExecuteNonQuery();
                 }
             }
-
-            
         }
 
-        public List<ComponentePermiso> ObtenerTodos()
+        public int CrearGrupo(string codigo, string nombre, List<int> hijosIds)
         {
-            List<ComponentePermiso> permisos = new List<ComponentePermiso>();
-
-            using (SqlConnection conexion = new Conexion().ObtenerConexion())
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
-                conexion.Open();
+                cn.Open();
 
-                string query = "SELECT Id, Nombre, EsGrupo FROM Permiso ORDER BY EsGrupo DESC, Nombre";
-
-                using (SqlCommand comando = new SqlCommand(query, conexion))
-                using (SqlDataReader reader = comando.ExecuteReader())
+                using (SqlTransaction transaccion = cn.BeginTransaction())
                 {
-                    while (reader.Read())
+                    try
                     {
-                        bool esGrupo = Convert.ToBoolean(reader["EsGrupo"]);
+                        int grupoId;
+                        string query = "INSERT INTO Permiso (Nombre, Codigo, EsGrupo) OUTPUT INSERTED.Id VALUES (@Nombre, @Codigo, 1)";
 
-                        ComponentePermiso permiso;
-
-                        if (esGrupo)
+                        using (SqlCommand comando = new SqlCommand(query, cn, transaccion))
                         {
-                            permiso = new GrupoPermisos
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Nombre = reader["Nombre"].ToString()
-                            };
-                        }
-                        else
-                        {
-                            permiso = new PermisoSimple
-                            {
-                                Id = Convert.ToInt32(reader["Id"]),
-                                Nombre = reader["Nombre"].ToString()
-                            };
+                            comando.Parameters.AddWithValue("@Nombre", nombre);
+                            comando.Parameters.AddWithValue("@Codigo", codigo);
+                            grupoId = Convert.ToInt32(comando.ExecuteScalar());
                         }
 
-                        permisos.Add(permiso);
+                        InsertarHijos(cn, transaccion, grupoId, hijosIds);
+
+                        transaccion.Commit();
+                        return grupoId;
+                    }
+                    catch
+                    {
+                        transaccion.Rollback();
+                        throw;
                     }
                 }
             }
-
-            return permisos;
         }
 
-        public int CrearGrupoPermiso(string nombre)
+        public void ModificarGrupo(int grupoId, string codigo, string nombre, List<int> hijosIds)
         {
             using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
                 cn.Open();
 
-                string query = @" INSERT INTO Permiso (Nombre, Codigo, EsGrupo) OUTPUT INSERTED.Id VALUES (@Nombre, NULL, 1)";
-
-                using (SqlCommand comando = new SqlCommand(query, cn))
+                using (SqlTransaction transaccion = cn.BeginTransaction())
                 {
-                    comando.Parameters.AddWithValue("@Nombre", nombre);
+                    try
+                    {
+                        string query = @"UPDATE Permiso SET Nombre = @Nombre, Codigo = @Codigo WHERE Id = @Id AND EsGrupo = 1;
+                        DELETE FROM PermisoRelacion WHERE PadreId = @Id;";
 
-                    return Convert.ToInt32(comando.ExecuteScalar());
+                        using (SqlCommand comando = new SqlCommand(query, cn, transaccion))
+                        {
+                            comando.Parameters.AddWithValue("@Nombre", nombre);
+                            comando.Parameters.AddWithValue("@Codigo", codigo);
+                            comando.Parameters.AddWithValue("@Id", grupoId);
+                            comando.ExecuteNonQuery();
+                        }
+
+                        InsertarHijos(cn, transaccion, grupoId, hijosIds);
+
+                        transaccion.Commit();
+                    }
+                    catch
+                    {
+                        transaccion.Rollback();
+                        throw;
+                    }
                 }
             }
         }
 
-        public void AgregarPermisoAGrupo(int grupoId, int permisoHijoId)
+        private void InsertarHijos(SqlConnection cn, SqlTransaction transaccion, int grupoId, List<int> hijosIds)
         {
-            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            string query = "INSERT INTO PermisoRelacion (PadreId, HijoId) VALUES (@PadreId, @HijoId)";
+
+            foreach (int hijoId in hijosIds)
             {
-                cn.Open();
-
-                string query = @" IF NOT EXISTS (SELECT 1 FROM PermisoRelacion
-                WHERE PadreId = @PadreId AND HijoId = @HijoId
-            )
-            BEGIN
-                INSERT INTO PermisoRelacion (PadreId, HijoId)
-                VALUES (@PadreId, @HijoId)
-            END";
-
-                using (SqlCommand comando = new SqlCommand(query, cn))
+                using (SqlCommand comando = new SqlCommand(query, cn, transaccion))
                 {
                     comando.Parameters.AddWithValue("@PadreId", grupoId);
-                    comando.Parameters.AddWithValue("@HijoId", permisoHijoId);
-
+                    comando.Parameters.AddWithValue("@HijoId", hijoId);
                     comando.ExecuteNonQuery();
                 }
             }
-        }
-
-        public List<ComponentePermiso> ObtenerPermisosGrupo(int idPermiso)
-        {
-            List<ComponentePermiso> permisos = new List<ComponentePermiso>();
-
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = @"SELECT p.Id, p.Nombre, p.EsGrupo 
-                     FROM Permiso p 
-                     INNER JOIN PermisoRelacion pr ON p.Id = pr.HijoId 
-                     WHERE pr.PadreId = @idPermiso";
-
-            using (SqlCommand cmd = new SqlCommand(query, cn))
-            {
-                cmd.Parameters.AddWithValue("@idPermiso", idPermiso);
-
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        bool esGrupo = Convert.ToBoolean(reader["EsGrupo"]);
-
-                        ComponentePermiso permiso;
-                        if (esGrupo)
-                            permiso = new GrupoPermisos { Id = Convert.ToInt32(reader["Id"]), Nombre = reader["Nombre"].ToString() };
-                        else
-                            permiso = new PermisoSimple { Id = Convert.ToInt32(reader["Id"]), Nombre = reader["Nombre"].ToString() };
-
-                        permisos.Add(permiso);
-                    }
-                }
-            }
-            cn.Close();
-            return permisos;
-        }
-
-        public void ActualizarNombreGrupo(int grupoId, string nombre)
-        {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = "UPDATE Permiso SET Nombre = @Nombre WHERE Id = @Id";
-            using (SqlCommand cmd = new SqlCommand(query, cn))
-            {
-                cmd.Parameters.AddWithValue("@Nombre", nombre);
-                cmd.Parameters.AddWithValue("@Id", grupoId);
-                cmd.ExecuteNonQuery();
-            }
-            cn.Close();
-        }
-
-        public void EliminarPermisosDeGrupo(int grupoId)
-        {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = "DELETE FROM PermisoRelacion WHERE PadreId = @PadreId";
-            using (SqlCommand cmd = new SqlCommand(query, cn))
-            {
-                cmd.Parameters.AddWithValue("@PadreId", grupoId);
-                cmd.ExecuteNonQuery();
-            }
-            cn.Close();
         }
 
         public void EliminarGrupo(int grupoId)
         {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = "DELETE FROM Permiso WHERE Id = @Id AND EsGrupo = 1";
-            using (SqlCommand cmd = new SqlCommand(query, cn))
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
-                cmd.Parameters.AddWithValue("@Id", grupoId);
-                cmd.ExecuteNonQuery();
+                cn.Open();
+
+                using (SqlTransaction transaccion = cn.BeginTransaction())
+                {
+                    try
+                    {
+                        string query = @"DELETE FROM PermisoRelacion WHERE PadreId = @Id;
+                        DELETE FROM Permiso WHERE Id = @Id AND EsGrupo = 1;";
+
+                        using (SqlCommand comando = new SqlCommand(query, cn, transaccion))
+                        {
+                            comando.Parameters.AddWithValue("@Id", grupoId);
+                            comando.ExecuteNonQuery();
+                        }
+
+                        transaccion.Commit();
+                    }
+                    catch
+                    {
+                        transaccion.Rollback();
+                        throw;
+                    }
+                }
             }
-            cn.Close();
         }
 
         public bool GrupoPoseeUsuarios(int grupoId)
         {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = "SELECT COUNT(*) FROM UsuarioPermiso WHERE PermisoId = @PermisoId";
-            using (SqlCommand cmd = new SqlCommand(query, cn))
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
-                cmd.Parameters.AddWithValue("@PermisoId", grupoId);
-                int cantidad = (int)cmd.ExecuteScalar();
-                return cantidad > 0;
+                cn.Open();
+
+                string query = "SELECT COUNT(*) FROM UsuarioPermiso WHERE PermisoId = @PermisoId";
+
+                using (SqlCommand comando = new SqlCommand(query, cn))
+                {
+                    comando.Parameters.AddWithValue("@PermisoId", grupoId);
+                    return (int)comando.ExecuteScalar() > 0;
+                }
             }
+        }
+
+        public Dictionary<int, int> ObtenerCantidadUsuariosPorPerfil()
+        {
+            Dictionary<int, int> cantidades = new Dictionary<int, int>();
+
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            {
+                cn.Open();
+
+                string query = "SELECT PermisoId, COUNT(*) AS Cantidad FROM UsuarioPermiso GROUP BY PermisoId";
+
+                using (SqlCommand comando = new SqlCommand(query, cn))
+                using (SqlDataReader reader = comando.ExecuteReader())
+                {
+                    while (reader.Read())
+                        cantidades[Convert.ToInt32(reader["PermisoId"])] = Convert.ToInt32(reader["Cantidad"]);
+                }
+            }
+
+            return cantidades;
         }
 
         public bool GrupoPerteneceAOtroGrupo(int grupoId)
@@ -357,27 +317,12 @@ namespace DAL
                 cn.Open();
 
                 string query = "SELECT COUNT(*) FROM PermisoRelacion WHERE HijoId = @HijoId";
-                using (SqlCommand cmd = new SqlCommand(query, cn))
+
+                using (SqlCommand comando = new SqlCommand(query, cn))
                 {
-                    cmd.Parameters.AddWithValue("@HijoId", grupoId);
-                    return (int)cmd.ExecuteScalar() > 0;
+                    comando.Parameters.AddWithValue("@HijoId", grupoId);
+                    return (int)comando.ExecuteScalar() > 0;
                 }
-            }
-        }
-
-        public bool EsAdministrador(int usuarioId)
-        {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = @"SELECT COUNT(*) FROM UsuarioPermiso 
-                     WHERE UsuarioId = @UsuarioId AND PermisoId = 6";
-
-            using (SqlCommand cmd = new SqlCommand(query, cn))
-            {
-                cmd.Parameters.AddWithValue("@UsuarioId", usuarioId);
-                return (int)cmd.ExecuteScalar() > 0;
             }
         }
     }

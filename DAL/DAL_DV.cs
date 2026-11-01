@@ -99,41 +99,5 @@ namespace DAL
             int dvv = validador.CalcularDVV(objetos);
             ActualizarDVV(dvv);
         }
-        public void RestaurarCampo(int idUsuario, string campo, string valorAnterior)
-        {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-
-            string columna = "";
-            if (campo == "Username") columna = "NomUsuario";
-            if (campo == "Password") columna = "Contraseña";
-            if (campo == "Bloqueado") columna = "Bloqueado";
-
-            if (string.IsNullOrEmpty(columna))
-            {
-                cn.Close();
-                return;
-            }
-
-            string query = $"UPDATE Usuarios SET {columna} = @Valor WHERE Id_Usuario = @Id";
-
-            using (SqlCommand cmd = new SqlCommand(query, cn))
-            {
-
-                if (campo == "Bloqueado")
-                    cmd.Parameters.AddWithValue("@Valor", valorAnterior == "Sí" ? 1 : 0);
-                else if (campo == "Password")
-                    cmd.Parameters.AddWithValue("@Valor", encriptador.Encriptar(valorAnterior));
-                else
-                    cmd.Parameters.AddWithValue("@Valor", valorAnterior);
-
-                cmd.Parameters.AddWithValue("@Id", idUsuario);
-                cmd.ExecuteNonQuery();
-            }
-
-            cn.Close();
-        }
     }
 }

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BLL;
+using Entidades;
 using Servicios;
 
 namespace Oasis_Sports
@@ -15,14 +16,11 @@ namespace Oasis_Sports
     public partial class FrmHistorialCambios : Form, IObserverIdioma
     {
         BLL_HistorialCambios bllHistorial = new BLL_HistorialCambios();
-        int idUsuario;
-        string nombreUsuario;
+        BLLUsuario bllUsuario = new BLLUsuario();
 
-        public FrmHistorialCambios(int idUsuario, string nombreUsuario)
+        public FrmHistorialCambios()
         {
             InitializeComponent();
-            this.idUsuario = idUsuario;
-            this.nombreUsuario = nombreUsuario;
             LanguageManager.GetInstance().Agregar(this);
         }
 
@@ -33,62 +31,98 @@ namespace Oasis_Sports
 
         private void FrmHistorialCambios_Load(object sender, EventArgs e)
         {
-            lblTitulo.Text = "Historial de cambios: " + nombreUsuario;
+            LanguageManager.GetInstance().TraducirControles(this);
+            CargarUsuarios();
+        }
+
+        private void CargarUsuarios()
+        {
+            cmbUsuario.DataSource = bllUsuario.Listar().OrderBy(u => u.Username).ToList();
+            cmbUsuario.DisplayMember = "Username";
+            cmbUsuario.ValueMember = "Id";
+        }
+
+        private void cmbUsuario_Format(object sender, ListControlConvertEventArgs e)
+        {
+            if (e.ListItem is Usuario u)
+                e.Value = u.Eliminado ? u.Username + " (eliminado)" : u.Username;
+        }
+
+        private void cmbUsuario_SelectedIndexChanged(object sender, EventArgs e)
+        {
             CargarHistorial();
         }
 
         private void CargarHistorial()
         {
-            dgvHistorial.DataSource = bllHistorial.ObtenerHistorialUsuario(idUsuario);
+            if (!(cmbUsuario.SelectedItem is Usuario usuario))
+            {
+                dgvHistorial.DataSource = null;
+                return;
+            }
+
+            List<HistorialCambio> versiones = bllHistorial.ListarHistorial(usuario.Id);
+
+            DataTable tabla = new DataTable();
+            tabla.Columns.Add("IdHistorial", typeof(int));
+            tabla.Columns.Add("Fecha", typeof(DateTime));
+            tabla.Columns.Add("Operación", typeof(string));
+            tabla.Columns.Add("Realizado por", typeof(string));
+            tabla.Columns.Add("Nombre de usuario", typeof(string));
+            tabla.Columns.Add("Bloqueado", typeof(string));
+            tabla.Columns.Add("Eliminado", typeof(string));
+            tabla.Columns.Add("Cambios", typeof(string));
+
+            for (int i = 0; i < versiones.Count; i++)
+            {
+                HistorialCambio version = versiones[i];
+                HistorialCambio? anterior =i + 1 < versiones.Count ? versiones[i + 1] : null;
+
+                tabla.Rows.Add(
+                    version.IdHistorial,
+                    version.Fecha,
+                    version.Operacion,
+                    version.UsuarioCambio,
+                    version.Username,
+                    version.Bloqueado ? "Sí" : "No",
+                    version.Eliminado ? "Sí" : "No",
+                    bllHistorial.DescribirCambios(version, anterior));
+            }
+
+            dgvHistorial.DataSource = tabla;
+            dgvHistorial.Columns["IdHistorial"].Visible = false;
+            dgvHistorial.Columns["Fecha"].DefaultCellStyle.Format = "dd/MM/yyyy HH:mm:ss";
+            dgvHistorial.Columns["Cambios"].FillWeight = 250;
         }
 
-        private void FrmHistorialCambios_FormClosing(object sender, FormClosingEventArgs e)
+        private void btnRestaurar_Click(object sender, EventArgs e)
         {
-            LanguageManager.GetInstance().Quitar(this);
-        }
+            if (!(cmbUsuario.SelectedItem is Usuario usuario))
+            {
+                MessageBox.Show("Seleccioná un usuario.");
+                return;
+            }
 
-        BLLUsuario bLLUsuario = new BLLUsuario();
-        BLL_DV bll_DV = new BLL_DV();
-  
-        private void button1_Click(object sender, EventArgs e)
-        {
             if (dgvHistorial.CurrentRow == null)
             {
-                MessageBox.Show("Seleccioná un registro de la lista.");
+                MessageBox.Show("Seleccioná una versión de la lista.");
                 return;
             }
 
-            DataGridViewRow fila = dgvHistorial.CurrentRow;
-
-            string campo = fila.Cells["NombreCampo"].Value?.ToString() ?? "";
-            string valorAnterior = fila.Cells["ValorAnterior"].Value?.ToString() ?? "";
-
-
-            if (valorAnterior == "(restauración)")
-            {
-                MessageBox.Show("Este registro es una restauración, no se puede volver a restaurar.");
-                return;
-            }
-
-
-            if (campo == "Password")
-            {
-                MessageBox.Show("No se puede restaurar la contraseña porque está enmascarada por seguridad.");
-                return;
-            }
+            int idHistorial = Convert.ToInt32(dgvHistorial.CurrentRow.Cells["IdHistorial"].Value);
+            DateTime fecha = Convert.ToDateTime(dgvHistorial.CurrentRow.Cells["Fecha"].Value);
 
             DialogResult confirmacion = MessageBox.Show(
-                $"¿Restaurar el campo '{campo}' al valor '{valorAnterior}'?",
+                $"¿Restaurar el usuario '{usuario.Username}' al estado que tenía el {fecha:dd/MM/yyyy HH:mm:ss}?",
                 "Confirmar restauración",
-                MessageBoxButtons.YesNo
-            );
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
 
             if (confirmacion != DialogResult.Yes) return;
 
-            string quienRestaura = SessionManager.GetInstance().Usuario?.Username ?? "sistema";
             try
             {
-                bllHistorial.RestaurarCampo(idUsuario, campo, valorAnterior, quienRestaura);
+                bllHistorial.RestaurarVersion(usuario.Id, idHistorial);
             }
             catch (Exception ex)
             {
@@ -96,15 +130,31 @@ namespace Oasis_Sports
                 return;
             }
 
-            bll_DV.InicializarDVs();
+            new BLL_Evento().RegistrarEvento(new Evento()
+            {
+                Usuario = SessionManager.GetInstance().Usuario?.Username ?? "sistema",
+                Modulo = "Usuarios",
+                Descripcion = $"Restauración del usuario {usuario.Username} a la versión del {fecha:dd/MM/yyyy HH:mm:ss}",
+                Fecha = DateTime.Now,
+                Criticidad = 3
+            });
 
-            MessageBox.Show("Campo restaurado correctamente.");
+            MessageBox.Show("Usuario restaurado correctamente.");
+
+            int idSeleccionado = usuario.Id;
+            CargarUsuarios();
+            cmbUsuario.SelectedValue = idSeleccionado;
             CargarHistorial();
         }
 
-        private void button2_Click_2(object sender, EventArgs e)
+        private void btnCerrar_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void FrmHistorialCambios_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            LanguageManager.GetInstance().Quitar(this);
         }
     }
 }

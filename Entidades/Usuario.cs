@@ -9,7 +9,7 @@
         public bool Eliminado { get; set; }
         public int DVH { get; set; }
 
-        public List<ComponentePermiso> Permisos { get; set; } = new List<ComponentePermiso>();
+        public GrupoPermisos Perfil { get; set; }
 
         public int ObtenerIdParaDV() => Id;
 

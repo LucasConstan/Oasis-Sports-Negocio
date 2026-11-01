@@ -41,37 +41,37 @@ namespace Oasis_Sports
 
 
 
-        private void CargarPermisosAsignados(int usuarioId)
+        private void CargarPerfilUsuario(int usuarioId)
         {
             treeView1.Nodes.Clear();
 
-            List<ComponentePermiso> permisos = permisoBLL.ObtenerPermisosUsuario(usuarioId);
+            GrupoPermisos perfil = permisoBLL.ObtenerPerfilUsuario(usuarioId);
 
-            foreach (ComponentePermiso permiso in permisos)
+            if (perfil != null)
             {
-                treeView1.Nodes.Add(CrearNodoPermiso(permiso));
+                TreeNode nodoPerfil = CrearNodoPermiso(perfil);
+                nodoPerfil.Text = $"{LanguageManager.GetInstance().ObtenerTexto("Perfil")}: {perfil}";
+                treeView1.Nodes.Add(nodoPerfil);
             }
 
             treeView1.ExpandAll();
+
+            if (treeView1.Nodes.Count > 0)
+                treeView1.TopNode = treeView1.Nodes[0];
         }
 
         private TreeNode CrearNodoPermiso(ComponentePermiso permiso)
         {
-            TreeNode nodo = new TreeNode();
+            bool esGrupo = permiso is GrupoPermisos;
 
-            if (permiso is GrupoPermisos)
-                nodo.Text = "[Grupo] " + permiso.Nombre;
-            else
-                nodo.Text = "[Permiso] " + permiso.Nombre;
-
+            TreeNode nodo = new TreeNode($"{LanguageManager.GetInstance().ObtenerTexto(esGrupo ? "Grupo" : "Permiso")}: {permiso}");
             nodo.Tag = permiso;
 
-            foreach (ComponentePermiso hijo in permiso.ObtenerHijos())
-            {
-                TreeNode nodoHijo = CrearNodoPermiso(hijo);
+            if (!esGrupo)
+                nodo.NodeFont = this.Font;
 
-                nodo.Nodes.Add(nodoHijo);
-            }
+            foreach (ComponentePermiso hijo in permiso.ObtenerHijos())
+                nodo.Nodes.Add(CrearNodoPermiso(hijo));
 
             return nodo;
         }
@@ -81,22 +81,20 @@ namespace Oasis_Sports
             cmbUsuarios.DataSource = null;
             cmbUsuarios.DisplayMember = "Username";
             cmbUsuarios.ValueMember = "Id";
-            cmbUsuarios.DataSource = usuarioBLL.Listar();
+            cmbUsuarios.DataSource = usuarioBLL.ListarActivos();
         }
 
-        private void CargarLista()
+        private void CargarPerfiles()
         {
-            lstDisponibles.DataSource = null;
-            lstDisponibles.DisplayMember = "Nombre";
-            lstDisponibles.ValueMember = "Id";
-            lstDisponibles.DataSource = permisoBLL.ObtenerTodos();
+            lstPerfiles.DataSource = null;
+            lstPerfiles.DataSource = permisoBLL.ObtenerPerfiles();
         }
 
         private void FrmGestionPerfiles_Load(object sender, EventArgs e)
         {
 
             CargarUsuarios();
-            CargarLista();
+            CargarPerfiles();
             RegistrarClaves();
 
         }
@@ -157,6 +155,18 @@ namespace Oasis_Sports
             }
         }
 
+        private void RegistrarEventoPerfiles(string descripcion, int criticidad)
+        {
+            new BLL_Evento().RegistrarEvento(new Evento()
+            {
+                Usuario = SessionManager.GetInstance().Usuario.Username,
+                Modulo = "Perfiles",
+                Descripcion = descripcion,
+                Fecha = DateTime.Now,
+                Criticidad = criticidad
+            });
+        }
+
         private void cmbUsuarios_SelectedIndexChanged(object sender, EventArgs e)
         {
             Usuario usuario = cmbUsuarios.SelectedItem as Usuario;
@@ -164,25 +174,39 @@ namespace Oasis_Sports
             if (usuario == null)
                 return;
 
-            CargarPermisosAsignados(usuario.Id);
+            CargarPerfilUsuario(usuario.Id);
         }
 
         private void btnAgregar_Click(object sender, EventArgs e)
         {
             Usuario usuario = cmbUsuarios.SelectedItem as Usuario;
-            ComponentePermiso permiso = lstDisponibles.SelectedItem as ComponentePermiso;
+            GrupoPermisos perfil = lstPerfiles.SelectedItem as GrupoPermisos;
 
-            if (usuario == null || permiso == null)
+            if (usuario == null || perfil == null)
             {
-                MessageBox.Show("Seleccione un usuario y un permiso");
+                MessageBox.Show("Seleccione un usuario y un perfil.");
                 return;
             }
 
+            GrupoPermisos perfilActual = permisoBLL.ObtenerPerfilUsuario(usuario.Id);
+
+            if (perfilActual != null && perfilActual.Id != perfil.Id)
+            {
+                DialogResult confirmacion = MessageBox.Show(
+                    $"El usuario {usuario.Username} tiene el perfil '{perfilActual}'. ¿Desea reemplazarlo por '{perfil}'?",
+                    "Confirmar cambio de perfil",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (confirmacion != DialogResult.Yes)
+                    return;
+            }
 
             try
             {
-                permisoBLL.AsignarPermiso(usuario.Id, permiso.Id);
-                CargarPermisosAsignados(usuario.Id);
+                permisoBLL.AsignarPerfil(usuario.Id, perfil);
+                RegistrarEventoPerfiles($"Asignación del perfil {perfil.Codigo} al usuario {usuario.Username}", 2);
+                CargarPerfilUsuario(usuario.Id);
             }
             catch (Exception ex)
             {
@@ -194,28 +218,31 @@ namespace Oasis_Sports
         {
             Usuario usuario = cmbUsuarios.SelectedItem as Usuario;
 
-            if (usuario == null || treeView1.SelectedNode == null)
+            if (usuario == null)
                 return;
 
-            if (treeView1.SelectedNode.Parent != null)
+            GrupoPermisos perfilActual = permisoBLL.ObtenerPerfilUsuario(usuario.Id);
+
+            if (perfilActual == null)
             {
-                MessageBox.Show("No se puede quitar un permiso heredado. Debe quitarse el grupo que lo contiene.");
+                MessageBox.Show("El usuario no tiene un perfil asignado.");
                 return;
             }
 
-            ComponentePermiso permiso = treeView1.SelectedNode.Tag as ComponentePermiso;
+            DialogResult confirmacion = MessageBox.Show(
+                $"¿Desea quitar el perfil '{perfilActual}' al usuario {usuario.Username}?",
+                "Confirmar",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
 
-            if (permiso == null)
-            {
-                MessageBox.Show("Seleccione un usuario y un permiso");
+            if (confirmacion != DialogResult.Yes)
                 return;
-            }
-
 
             try
             {
-                permisoBLL.QuitarPermisoAUsuario(usuario.Id, permiso.Id);
-                CargarPermisosAsignados(usuario.Id);
+                permisoBLL.QuitarPerfil(usuario.Id);
+                RegistrarEventoPerfiles($"Se quitó el perfil {perfilActual.Codigo} al usuario {usuario.Username}", 3);
+                CargarPerfilUsuario(usuario.Id);
             }
             catch (Exception ex)
             {

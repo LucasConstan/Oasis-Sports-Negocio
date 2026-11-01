@@ -20,6 +20,7 @@ namespace Oasis_Sports
             uSUARIOToolStripMenuItem = new ToolStripMenuItem();
             lOGINToolStripMenuItem = new ToolStripMenuItem();
             lOGOUTToolStripMenuItem = new ToolStripMenuItem();
+            cAMBIARCONTRASEÑAToolStripMenuItem = new ToolStripMenuItem();
             bitacoraToolStripMenuItem = new ToolStripMenuItem();
             bITACORAToolStripMenuItem1 = new ToolStripMenuItem();
             gESTIONDEUSUARIOSToolStripMenuItem = new ToolStripMenuItem();
@@ -57,7 +58,7 @@ namespace Oasis_Sports
             // 
             // uSUARIOToolStripMenuItem
             // 
-            uSUARIOToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { lOGINToolStripMenuItem, lOGOUTToolStripMenuItem });
+            uSUARIOToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { lOGINToolStripMenuItem, lOGOUTToolStripMenuItem, cAMBIARCONTRASEÑAToolStripMenuItem });
             uSUARIOToolStripMenuItem.Font = new Font("Times New Roman", 10F);
             uSUARIOToolStripMenuItem.Name = "uSUARIOToolStripMenuItem";
             uSUARIOToolStripMenuItem.Size = new Size(78, 20);
@@ -76,6 +77,13 @@ namespace Oasis_Sports
             lOGOUTToolStripMenuItem.Size = new Size(130, 22);
             lOGOUTToolStripMenuItem.Text = "LOGOUT";
             lOGOUTToolStripMenuItem.Click += lOGOUTToolStripMenuItem_Click;
+            //
+            // cAMBIARCONTRASEÑAToolStripMenuItem
+            //
+            cAMBIARCONTRASEÑAToolStripMenuItem.Name = "cAMBIARCONTRASEÑAToolStripMenuItem";
+            cAMBIARCONTRASEÑAToolStripMenuItem.Size = new Size(220, 22);
+            cAMBIARCONTRASEÑAToolStripMenuItem.Text = "CAMBIAR CONTRASEÑA";
+            cAMBIARCONTRASEÑAToolStripMenuItem.Click += cAMBIARCONTRASEÑAToolStripMenuItem_Click;
             // 
             // bitacoraToolStripMenuItem
             // 
@@ -280,6 +288,7 @@ namespace Oasis_Sports
         private ToolStripMenuItem lOGINToolStripMenuItem;
         private ToolStripMenuItem sALIRToolStripMenuItem;
         private ToolStripMenuItem lOGOUTToolStripMenuItem;
+        private ToolStripMenuItem cAMBIARCONTRASEÑAToolStripMenuItem;
         private ToolStripMenuItem bitacoraToolStripMenuItem;
         private ToolStripMenuItem bITACORAToolStripMenuItem1;
         private ToolStripMenuItem gESTIONDEUSUARIOSToolStripMenuItem;

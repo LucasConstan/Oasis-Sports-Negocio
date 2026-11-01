@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,7 +24,6 @@ namespace Oasis_Sports
         {
             InitializeComponent();
             LanguageManager.GetInstance().Agregar(this);
-            RegistrarClaves(); 
         }
 
         private void RegistrarClaves()
@@ -44,7 +44,6 @@ namespace Oasis_Sports
                 return;
             }
 
-            
             if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
                 && !clavesExistentes.Contains(c.Name))
             {
@@ -54,7 +53,7 @@ namespace Oasis_Sports
                     Clave = c.Name,
                     Texto = c.Text
                 });
-                clavesExistentes.Add(c.Name); 
+                clavesExistentes.Add(c.Name);
             }
 
             foreach (Control hijo in c.Controls)
@@ -97,93 +96,123 @@ namespace Oasis_Sports
                 ActualizarIdioma();
         }
 
-      
+        private void FrmBitacora_Load(object sender, EventArgs e)
+        {
+            RegistrarClaves();
+            LanguageManager.GetInstance().TraducirControles(this);
+
+            CargarBitacora();
+            CargarFiltros();
+            LimpiarFiltros();
+        }
 
         private void CargarBitacora()
         {
             tablaEventos = bllEvento.ListarEventos();
 
-            dgvBitacora.DataSource = tablaEventos;
+            dgvBitacora.DataSource = tablaEventos.DefaultView;
+
+            if (dgvBitacora.Columns.Contains("IdEvento"))
+                dgvBitacora.Columns["IdEvento"].Visible = false;
         }
 
-        private void dgvBitacora_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void CargarFiltros()
         {
+            cmbModulo.Items.Clear();
+            cmbModulo.Items.Add("Todos");
+            foreach (string modulo in tablaEventos.AsEnumerable()
+                .Select(r => r["Modulo"].ToString())
+                .Where(m => !string.IsNullOrWhiteSpace(m))
+                .Distinct()
+                .OrderBy(m => m))
+                cmbModulo.Items.Add(modulo);
 
-        }
-
-        private void FrmBitacora_Load_1(object sender, EventArgs e)
-        {
-            CargarBitacora();
-
+            cmbCriticidad.Items.Clear();
             cmbCriticidad.Items.Add("Todas");
-            cmbCriticidad.Items.Add("1");
-            cmbCriticidad.Items.Add("2");
-            cmbCriticidad.Items.Add("3");
-            cmbCriticidad.SelectedIndex = 0;
+            foreach (int criticidad in tablaEventos.AsEnumerable()
+                .Select(r => Convert.ToInt32(r["Criticidad"]))
+                .Distinct()
+                .OrderBy(c => c))
+                cmbCriticidad.Items.Add(criticidad.ToString());
         }
 
-        private void label5_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            DataView vista = tablaEventos.DefaultView;
-
-            string filtro = "";
-
-
-            if (!string.IsNullOrWhiteSpace(txtUsuario.Text))
-            {
-                filtro += $"Usuario LIKE '%{txtUsuario.Text}%'";
-            }
-
-
-            if (cmbCriticidad.Text != "Todas")
-            {
-                if (filtro != "")
-                    filtro += " AND ";
-
-                filtro += $"Criticidad = {cmbCriticidad.Text}";
-            }
-
-
-            if (filtro != "")
-                filtro += " AND ";
-
-            filtro += $"Fecha >= #{dtpDesde.Value:yyyy-MM-dd}#";
-            filtro += $" AND Fecha <= #{dtpHasta.Value:yyyy-MM-dd 23:59:59}#";
-
-            vista.RowFilter = filtro;
-
-            dgvBitacora.DataSource = vista;
-        }
-
-        private void button2_Click(object sender, EventArgs e)
+        private void LimpiarFiltros()
         {
             txtUsuario.Clear();
-
+            cmbModulo.SelectedIndex = 0;
             cmbCriticidad.SelectedIndex = 0;
 
-            dtpDesde.Value = DateTime.Today.AddMonths(-1);
+            DateTime fechaMinima = tablaEventos.Rows.Count > 0
+                ? tablaEventos.AsEnumerable().Min(r => Convert.ToDateTime(r["Fecha"])).Date
+                : DateTime.Today.AddMonths(-1);
 
+            dtpDesde.Value = fechaMinima;
             dtpHasta.Value = DateTime.Today;
 
-            dgvBitacora.DataSource = tablaEventos;
+            tablaEventos.DefaultView.RowFilter = "";
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private string EscaparTextoFiltro(string texto)
         {
-            FrmMenu frmMenu = new FrmMenu();
-            frmMenu.Show();
-            this.Hide();
+            StringBuilder resultado = new StringBuilder();
+
+            foreach (char c in texto)
+            {
+                if (c == '[' || c == ']' || c == '*' || c == '%')
+                    resultado.Append('[').Append(c).Append(']');
+                else if (c == '\'')
+                    resultado.Append("''");
+                else
+                    resultado.Append(c);
+            }
+
+            return resultado.ToString();
+        }
+
+        private void btnBuscar_Click(object sender, EventArgs e)
+        {
+            if (dtpDesde.Value.Date > dtpHasta.Value.Date)
+            {
+                MessageBox.Show("La fecha desde no puede ser mayor a la fecha hasta.");
+                return;
+            }
+
+            List<string> condiciones = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(txtUsuario.Text))
+                condiciones.Add($"Usuario LIKE '%{EscaparTextoFiltro(txtUsuario.Text.Trim())}%'");
+
+            if (cmbModulo.SelectedIndex > 0)
+                condiciones.Add($"Modulo = '{cmbModulo.Text.Replace("'", "''")}'");
+
+            if (cmbCriticidad.SelectedIndex > 0)
+                condiciones.Add($"Criticidad = {Convert.ToInt32(cmbCriticidad.Text)}");
+
+            string desde = dtpDesde.Value.Date.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+            string hasta = dtpHasta.Value.Date.AddDays(1).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture);
+
+            condiciones.Add($"Fecha >= #{desde}#");
+            condiciones.Add($"Fecha < #{hasta}#");
+
+            tablaEventos.DefaultView.RowFilter = string.Join(" AND ", condiciones);
+
+            if (tablaEventos.DefaultView.Count == 0)
+                MessageBox.Show("No se encontraron eventos con los filtros seleccionados.");
+        }
+
+        private void btnLimpiar_Click(object sender, EventArgs e)
+        {
+            LimpiarFiltros();
+        }
+
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
 
         private void FrmBitacora_FormClosing(object sender, FormClosingEventArgs e)
         {
             LanguageManager.GetInstance().Quitar(this);
-
         }
     }
 }

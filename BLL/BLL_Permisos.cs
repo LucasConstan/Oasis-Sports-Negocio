@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Entidades;
 using Servicios;
@@ -11,81 +12,122 @@ namespace BLL
 {
     public class BLL_Permisos
     {
-        private  DAL_Permisos permisoDAL = new DAL_Permisos();
+        private DAL_Permisos permisoDAL = new DAL_Permisos();
 
+        public const string CODIGO_PERFIL_ADMIN = "AD001";
+        private static readonly string[] PERMISOS_OBLIGATORIOS_ADMIN = { "SE001", "SE002" };
 
-
-
-        public bool UsuarioTienePermiso(int usuarioId, string codigoPermiso)
+        public bool TienePermiso(string codigoPermiso)
         {
-            List<ComponentePermiso> permisos = permisoDAL.ObtenerPermisosDeUsuario(usuarioId);
+            Usuario usuario = SessionManager.GetInstance().Usuario;
 
-            foreach (ComponentePermiso permiso in permisos)
-            {
-                if (permiso.TienePermiso(codigoPermiso))
-                    return true;
-            }
-
-            return false;
+            return usuario != null && usuario.Perfil != null && usuario.Perfil.TienePermiso(codigoPermiso);
         }
 
-        public List<ComponentePermiso> ObtenerPermisosUsuario(int usuarioId)
+        public void CargarPerfil(Usuario usuario)
         {
-            return permisoDAL.ObtenerPermisosDeUsuario(usuarioId);
+            usuario.Perfil = permisoDAL.ObtenerPerfilDeUsuario(usuario.Id);
         }
 
-        public bool TienePermiso(string codigoPermiso, int usuarioId)
+        public bool EsAdministrador(Usuario usuario)
         {
-            if (SessionManager.GetInstance().Usuario == null)
-                return false;
-
-            List<ComponentePermiso> permisos = permisoDAL.ObtenerPermisosDeUsuario(usuarioId);
-
-            foreach (ComponentePermiso permiso in permisos)
-            {
-                if (permiso.TienePermiso(codigoPermiso))
-                    return true;
-            }
-
-            return false;
+            return usuario.Perfil != null && usuario.Perfil.Codigo == CODIGO_PERFIL_ADMIN;
         }
 
-        public void AsignarPermiso(int usuarioId, int permisoId)
+        public GrupoPermisos ObtenerPerfilUsuario(int usuarioId)
+        {
+            return permisoDAL.ObtenerPerfilDeUsuario(usuarioId);
+        }
+
+        public List<ComponentePermiso> ObtenerTodos()
+        {
+            return permisoDAL.ObtenerTodos();
+        }
+
+        public List<GrupoPermisos> ObtenerPerfiles()
+        {
+            return permisoDAL.ObtenerTodos().OfType<GrupoPermisos>().ToList();
+        }
+
+        public List<ComponentePermiso> ObtenerArbolesCompletos()
+        {
+            return permisoDAL.ObtenerArboles();
+        }
+
+        public void AsignarPerfil(int usuarioId, ComponentePermiso perfil)
+        {
+            if (!(perfil is GrupoPermisos))
+                throw new Exception("El perfil de un usuario debe ser un permiso compuesto.");
+
+            ValidarCambioDePerfil(usuarioId);
+
+            if (usuarioId == BLLUsuario.ID_USUARIO_ADMIN && perfil.Codigo != CODIGO_PERFIL_ADMIN)
+                throw new Exception("El usuario administrador del sistema debe conservar el perfil Administrador.");
+
+            GrupoPermisos perfilActual = permisoDAL.ObtenerPerfilDeUsuario(usuarioId);
+
+            if (perfilActual != null && perfilActual.Id == perfil.Id)
+                throw new Exception($"El usuario ya tiene asignado el perfil '{perfil}'.");
+
+            permisoDAL.AsignarPerfil(usuarioId, perfil.Id);
+        }
+
+        public void QuitarPerfil(int usuarioId)
+        {
+            ValidarCambioDePerfil(usuarioId);
+
+            if (usuarioId == BLLUsuario.ID_USUARIO_ADMIN)
+                throw new Exception("No se puede quitar el perfil al usuario administrador del sistema.");
+
+            permisoDAL.QuitarPerfil(usuarioId);
+        }
+
+        private void ValidarCambioDePerfil(int usuarioId)
         {
             Usuario usuario = new DAL_Usuario().Listar().FirstOrDefault(u => u.Id == usuarioId);
+
             if (usuario == null || usuario.Eliminado)
-                throw new Exception("No se pueden asignar permisos a un usuario inexistente o eliminado.");
+                throw new Exception("No se puede modificar el perfil de un usuario inexistente o eliminado.");
 
-            List<ComponentePermiso> permisosUsuario = permisoDAL.ObtenerPermisosDeUsuario(usuarioId);
-            ValidarSinRedundancia(permisoId, permisosUsuario, "al usuario");
+            Usuario usuarioSesion = SessionManager.GetInstance().Usuario;
 
-            permisoDAL.AsignarPermiso(usuarioId, permisoId);
+            if (usuarioSesion != null && usuarioSesion.Id == usuarioId)
+                throw new Exception("No puede modificar su propio perfil.");
         }
 
         public void ValidarPermisoParaGrupo(int grupoId, ComponentePermiso permiso, List<ComponentePermiso> permisosDelGrupo)
         {
-            if (Contiene(permisoDAL.ObtenerArbolPermiso(permiso.Id), grupoId))
-                throw new Exception($"No se puede agregar '{permiso.Nombre}'.");
+            ComponentePermiso nuevo = permisoDAL.ObtenerArbolPermiso(permiso.Id);
 
-            ValidarSinRedundancia(permiso.Id, permisosDelGrupo, "al grupo");
-        }
+            if (Contiene(nuevo, grupoId))
+                throw new Exception($"No se puede agregar '{nuevo}' porque contiene al grupo que se está editando.");
 
-        private void ValidarSinRedundancia(int permisoId, List<ComponentePermiso> existentes, string destino)
-        {
-            ComponentePermiso nuevo = permisoDAL.ObtenerArbolPermiso(permisoId);
-
-            foreach (ComponentePermiso existente in existentes)
+            foreach (ComponentePermiso existente in permisosDelGrupo)
             {
                 if (existente.Id == nuevo.Id)
-                    throw new Exception($"El permiso '{nuevo.Nombre}' ya está asignado {destino}.");
+                    throw new Exception($"'{nuevo}' ya está en el grupo.");
 
                 ComponentePermiso arbolExistente = permisoDAL.ObtenerArbolPermiso(existente.Id);
 
                 if (Contiene(arbolExistente, nuevo.Id))
-                    throw new Exception($"'{nuevo.Nombre}' ya está incluido en el grupo '{arbolExistente.Nombre}' asignado {destino}.");
+                    throw new Exception($"'{nuevo}' ya está incluido en '{arbolExistente}', que forma parte del grupo.");
 
                 if (Contiene(nuevo, existente.Id))
-                    throw new Exception($"El grupo '{nuevo.Nombre}' ya incluye '{arbolExistente.Nombre}', que está asignado {destino}. Quítelo antes de agregar el grupo.");
+                    throw new Exception($"'{nuevo}' ya incluye a '{arbolExistente}', que forma parte del grupo. Quítelo antes de agregarlo.");
+            }
+        }
+
+        private void ValidarComposicion(int grupoId, List<ComponentePermiso> permisos)
+        {
+            if (permisos == null || permisos.Count == 0)
+                throw new Exception("El grupo debe tener al menos un permiso.");
+
+            List<ComponentePermiso> validados = new List<ComponentePermiso>();
+
+            foreach (ComponentePermiso permiso in permisos)
+            {
+                ValidarPermisoParaGrupo(grupoId, permiso, validados);
+                validados.Add(permiso);
             }
         }
 
@@ -94,38 +136,24 @@ namespace BLL
             return componente.Id == permisoId || componente.ObtenerHijos().Any(h => Contiene(h, permisoId));
         }
 
-        public const int ID_PERFIL_ADMIN = 6;
-
-        public void QuitarPermisoAUsuario(int usuarioId, int permisoId)
+        private string ValidarCodigo(string codigo, int grupoId)
         {
-            if (usuarioId == BLLUsuario.ID_USUARIO_ADMIN && permisoId == ID_PERFIL_ADMIN)
-                throw new Exception("No se puede quitar el perfil Admin al usuario administrador del sistema.");
+            if (string.IsNullOrWhiteSpace(codigo))
+                throw new Exception("Debe ingresar un código para el grupo.");
 
-            permisoDAL.QuitarPermiso(usuarioId, permisoId);
-        }
+            codigo = codigo.Trim().ToUpper();
 
-        public List<ComponentePermiso> ObtenerTodos()
-        {
-            return permisoDAL.ObtenerTodos();
-        }
+            if (!Regex.IsMatch(codigo, "^[A-Z]{2}[0-9]{3}$"))
+                throw new Exception("El código debe tener 2 letras y 3 números (por ejemplo: GE050).");
 
-        public int CrearGrupoPermiso(string nombre)
-        {
-            nombre = ValidarNombreGrupo(nombre, 0);
-            return permisoDAL.CrearGrupoPermiso(nombre);
-        }
+            bool duplicado = permisoDAL.ObtenerTodos().Any(p =>
+                p.Id != grupoId &&
+                string.Equals(p.Codigo, codigo, StringComparison.OrdinalIgnoreCase));
 
-        public void AgregarPermisoAGrupo(int grupoId, int permisoHijoId)
-        {
-            if (Contiene(permisoDAL.ObtenerArbolPermiso(permisoHijoId), grupoId))
-                throw new Exception("No se puede agregar el permiso.");
+            if (duplicado)
+                throw new Exception($"Ya existe un permiso con el código '{codigo}'.");
 
-            permisoDAL.AgregarPermisoAGrupo(grupoId, permisoHijoId);
-        }
-
-        public List<ComponentePermiso> ObtenerPermisosGrupo(int grupoId)
-        {
-            return permisoDAL.ObtenerPermisosGrupo(grupoId);
+            return codigo;
         }
 
         private string ValidarNombreGrupo(string nombre, int grupoId)
@@ -148,56 +176,81 @@ namespace BLL
             return nombre;
         }
 
-        public void ModificarGrupoPermiso(int grupoId, string nombre, List<ComponentePermiso> permisosNuevos)
+        public int CrearGrupoPermiso(string codigo, string nombre, List<ComponentePermiso> permisos)
         {
+            codigo = ValidarCodigo(codigo, 0);
+            nombre = ValidarNombreGrupo(nombre, 0);
+            ValidarComposicion(0, permisos);
+
+            return permisoDAL.CrearGrupo(codigo, nombre, permisos.Select(p => p.Id).ToList());
+        }
+
+        public void ModificarGrupoPermiso(int grupoId, string codigo, string nombre, List<ComponentePermiso> permisos)
+        {
+            ComponentePermiso grupo = permisoDAL.ObtenerTodos().FirstOrDefault(p => p.Id == grupoId);
+
+            if (!(grupo is GrupoPermisos))
+                throw new Exception("El grupo seleccionado no existe.");
+
+            codigo = ValidarCodigo(codigo, grupoId);
             nombre = ValidarNombreGrupo(nombre, grupoId);
+            ValidarComposicion(grupoId, permisos);
 
-            if (permisosNuevos.Count == 0)
-                throw new Exception("El grupo debe tener al menos un permiso.");
+            if (grupo.Codigo == CODIGO_PERFIL_ADMIN)
+                ValidarPerfilAdministrador(codigo, permisos);
 
-            List<ComponentePermiso> validados = new List<ComponentePermiso>();
-            foreach (ComponentePermiso permiso in permisosNuevos)
+            permisoDAL.ModificarGrupo(grupoId, codigo, nombre, permisos.Select(p => p.Id).ToList());
+
+            Usuario usuarioSesion = SessionManager.GetInstance().Usuario;
+
+            if (usuarioSesion != null)
+                CargarPerfil(usuarioSesion);
+        }
+
+        private void ValidarPerfilAdministrador(string codigo, List<ComponentePermiso> permisos)
+        {
+            if (codigo != CODIGO_PERFIL_ADMIN)
+                throw new Exception("No se puede cambiar el código del perfil Administrador.");
+
+            GrupoPermisos simulado = new GrupoPermisos();
+
+            foreach (ComponentePermiso permiso in permisos)
+                simulado.Agregar(permisoDAL.ObtenerArbolPermiso(permiso.Id));
+
+            foreach (string codigoObligatorio in PERMISOS_OBLIGATORIOS_ADMIN)
             {
-                ValidarPermisoParaGrupo(grupoId, permiso, validados);
-                validados.Add(permiso);
+                if (!simulado.TienePermiso(codigoObligatorio))
+                    throw new Exception($"El perfil Administrador debe incluir el permiso '{codigoObligatorio}'.");
             }
-
-            permisoDAL.ActualizarNombreGrupo(grupoId, nombre);
-            permisoDAL.EliminarPermisosDeGrupo(grupoId);
-
-            foreach (ComponentePermiso permiso in permisosNuevos)
-                permisoDAL.AgregarPermisoAGrupo(grupoId, permiso.Id);
         }
 
         public void EliminarGrupoPermiso(int grupoId)
         {
+            ComponentePermiso grupo = permisoDAL.ObtenerTodos().FirstOrDefault(p => p.Id == grupoId);
+
+            if (!(grupo is GrupoPermisos))
+                throw new Exception("El grupo seleccionado no existe.");
+
+            if (grupo.Codigo == CODIGO_PERFIL_ADMIN)
+                throw new Exception("No se puede eliminar el perfil Administrador.");
+
             if (permisoDAL.GrupoPoseeUsuarios(grupoId))
-                throw new Exception("No se puede eliminar el grupo porque hay usuarios que lo tienen asignado.");
+                throw new Exception("No se puede eliminar el grupo porque es el perfil de al menos un usuario.");
 
             if (permisoDAL.GrupoPerteneceAOtroGrupo(grupoId))
                 throw new Exception("No se puede eliminar el grupo porque forma parte de otro grupo. Quítelo de ese grupo primero.");
 
-            permisoDAL.EliminarPermisosDeGrupo(grupoId);
-            permisoDAL.EliminarGrupo(grupoId);           
+            permisoDAL.EliminarGrupo(grupoId);
+        }
+
+        public Dictionary<int, int> ObtenerCantidadUsuariosPorPerfil()
+        {
+            return permisoDAL.ObtenerCantidadUsuariosPorPerfil();
         }
 
         public bool GrupoPoseeUsuarios(int grupoId)
         {
             return permisoDAL.GrupoPoseeUsuarios(grupoId);
         }
-
-        public bool EsAdministrador(int usuarioId)
-        {
-            return permisoDAL.EsAdministrador(usuarioId);
-        }
-
-        public bool ExisteGrupoConNombre(string nombre, List<ComponentePermiso> permisosExistentes)
-        {
-            return permisosExistentes
-                .OfType<GrupoPermisos>()
-                .Any(g => g.Nombre.Equals(nombre, StringComparison.OrdinalIgnoreCase));
-        }
-
-
     }
 }

@@ -16,15 +16,13 @@ namespace DAL
         {
             List<Usuario> lista = new List<Usuario>();
 
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = "select Id_Usuario, NomUsuario, Contraseña, Bloqueado, Eliminado from Usuarios";
-
-            SqlCommand cmd = new SqlCommand(query, cn);
-            try
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
+                cn.Open();
+
+                string query = "select Id_Usuario, NomUsuario, Contraseña, Bloqueado, Eliminado from Usuarios";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -35,21 +33,11 @@ namespace DAL
                             Username = reader["NomUsuario"].ToString(),
                             Password = reader["Contraseña"].ToString(),
                             Bloqueado = Convert.ToBoolean(reader["Bloqueado"]),
-                            Eliminado = Convert.ToBoolean(reader["Eliminado"]),
-
-
+                            Eliminado = Convert.ToBoolean(reader["Eliminado"])
                         });
-
                     }
                 }
             }
-            catch (Exception ex) 
-            {
-                System.Console.WriteLine("Error en la búsqueda: " + ex.Message);
-                
-            }
-
-
 
             return lista;
         }
@@ -60,56 +48,93 @@ namespace DAL
 
         public void AñadirUsuario(Usuario usuario)
         {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = "INSERT INTO usuarios (nomUsuario, contraseña) VALUES (@NomUsuario, @Contraseña)";
-
-            using (SqlCommand cmd = new SqlCommand(query, cn))
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
-                
-                cmd.Parameters.AddWithValue("@NomUsuario", usuario.Username);
-                cmd.Parameters.AddWithValue("@Contraseña", encriptador.Encriptar(usuario.Password)); 
+                cn.Open();
 
-                
-                cmd.ExecuteNonQuery();
+                string query = "INSERT INTO usuarios (nomUsuario, contraseña) VALUES (@NomUsuario, @Contraseña)";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@NomUsuario", usuario.Username);
+                    cmd.Parameters.AddWithValue("@Contraseña", encriptador.Encriptar(usuario.Password));
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
         public void EliminarUsuario(int idUsuario)
         {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = "UPDATE Usuarios SET Eliminado = 1 WHERE Id_Usuario = @Id_Usuario"; ;
-
-            using (SqlCommand cmd = new SqlCommand(query, cn))
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
-                cmd.Parameters.AddWithValue("@Id_Usuario", idUsuario);
-                cmd.ExecuteNonQuery();
+                cn.Open();
+
+                string query = "UPDATE Usuarios SET Eliminado = 1 WHERE Id_Usuario = @Id_Usuario";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@Id_Usuario", idUsuario);
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
         public void ModificarUsuario(int idUsuario, Usuario usuario)
         {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
-
-            string query = @"UPDATE Usuarios
-                     SET NomUsuario = @NomUsuario,
-                         Contraseña = @Contraseña
-                     WHERE Id_Usuario = @IdUsuario";
-
-            using (SqlCommand cmd = new SqlCommand(query, cn))
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
             {
-                cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
-                cmd.Parameters.AddWithValue("@NomUsuario", usuario.Username);
-                cmd.Parameters.AddWithValue("@Contraseña", encriptador.Encriptar(usuario.Password));
+                cn.Open();
 
-                cmd.ExecuteNonQuery();
+                string query = @"UPDATE Usuarios
+                         SET NomUsuario = @NomUsuario,
+                             Contraseña = @Contraseña
+                         WHERE Id_Usuario = @IdUsuario";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
+                    cmd.Parameters.AddWithValue("@NomUsuario", usuario.Username);
+                    cmd.Parameters.AddWithValue("@Contraseña", encriptador.Encriptar(usuario.Password));
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void ModificarNombreUsuario(int idUsuario, string username)
+        {
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            {
+                cn.Open();
+
+                string query = @"UPDATE Usuarios
+                         SET NomUsuario = @NomUsuario
+                         WHERE Id_Usuario = @IdUsuario";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
+                    cmd.Parameters.AddWithValue("@NomUsuario", username);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void CambiarContraseña(int idUsuario, string nuevaContraseña)
+        {
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            {
+                cn.Open();
+
+                string query = @"UPDATE Usuarios
+                         SET Contraseña = @Contraseña
+                         WHERE Id_Usuario = @Id";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", idUsuario);
+                    cmd.Parameters.AddWithValue("@Contraseña", encriptador.Encriptar(nuevaContraseña));
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 
@@ -182,6 +207,29 @@ namespace DAL
             }
         }
 
-        
+        public void Restaurar(Usuario usuario)
+        {
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            {
+                cn.Open();
+
+                string query = @"UPDATE Usuarios
+                         SET NomUsuario = @NomUsuario,
+                             Contraseña = @Contraseña,
+                             Bloqueado = @Bloqueado,
+                             Eliminado = @Eliminado
+                         WHERE Id_Usuario = @Id";
+
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@Id", usuario.Id);
+                    cmd.Parameters.AddWithValue("@NomUsuario", usuario.Username);
+                    cmd.Parameters.AddWithValue("@Contraseña", usuario.Password);
+                    cmd.Parameters.AddWithValue("@Bloqueado", usuario.Bloqueado);
+                    cmd.Parameters.AddWithValue("@Eliminado", usuario.Eliminado);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

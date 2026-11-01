@@ -16,6 +16,8 @@ namespace Oasis_Sports
     public partial class FrmParticipantes : BaseForm, IObserverIdioma
     {
         BLL_Participante bllParticipante_348LC = new BLL_Participante();
+        BLL_SerializarParticipante bllSerializar_348LC = new BLL_SerializarParticipante();
+        BLL_DesSerializarParticipante bllDesSerializar_348LC = new BLL_DesSerializarParticipante();
         int idSeleccionado_348LC = 0;
 
         public FrmParticipantes()
@@ -172,15 +174,90 @@ namespace Oasis_Sports
             if (dgvParticipantes.CurrentRow == null)
                 return;
 
-            Participante participante_348LC = (Participante)dgvParticipantes.CurrentRow.DataBoundItem;
+            try
+            {
+                Participante participante_348LC = (Participante)dgvParticipantes.CurrentRow.DataBoundItem;
 
-            idSeleccionado_348LC = participante_348LC.Id;
-            txtDNI.Text = participante_348LC.DNI;
-            txtNombre.Text = participante_348LC.Nombre;
-            txtApellido.Text = participante_348LC.Apellido;
-            nudEdad.Value = participante_348LC.Edad;
-            txtTelefono.Text = participante_348LC.Telefono;
-            txtDireccion.Text = participante_348LC.Direccion;
+                idSeleccionado_348LC = participante_348LC.Id;
+                txtDNI.Text = participante_348LC.DNI;
+                txtNombre.Text = participante_348LC.Nombre;
+                txtApellido.Text = participante_348LC.Apellido;
+                nudEdad.Value = participante_348LC.Edad;
+                txtTelefono.Text = participante_348LC.Telefono;
+                txtDireccion.Text = participante_348LC.Direccion;
+            }
+            catch (Exception ex_348LC)
+            {
+                MessageBox.Show(ex_348LC.Message);
+            }
+        }
+
+        private void btnSerializar_Click(object sender, EventArgs e)
+        {
+            List<Participante> participantes_348LC = dgvParticipantes.DataSource as List<Participante>;
+
+            if (participantes_348LC == null || participantes_348LC.Count == 0)
+            {
+                MessageBox.Show("No hay participantes en la grilla para serializar.");
+                return;
+            }
+
+            SaveFileDialog dialogo_348LC = new SaveFileDialog();
+            dialogo_348LC.Filter = "Archivos XML (*.xml)|*.xml";
+            dialogo_348LC.FileName = "Participantes.xml";
+
+            if (dialogo_348LC.ShowDialog() != DialogResult.OK)
+            {
+                MessageBox.Show("Serialización cancelada.");
+                return;
+            }
+
+            try
+            {
+                bllSerializar_348LC.Serializar_348LC(participantes_348LC, dialogo_348LC.FileName);
+                txtRutaSerializar.Text = dialogo_348LC.FileName;
+                MessageBox.Show("Participantes serializados correctamente.");
+            }
+            catch (Exception ex_348LC)
+            {
+                MessageBox.Show("Error al serializar: " + ex_348LC.Message);
+            }
+        }
+
+        private void btnDesSerializar_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dialogo_348LC = new OpenFileDialog();
+            dialogo_348LC.Filter = "Archivos XML (*.xml)|*.xml";
+
+            if (dialogo_348LC.ShowDialog() != DialogResult.OK)
+            {
+                MessageBox.Show("Des-serialización cancelada.");
+                return;
+            }
+
+            try
+            {
+                List<Participante> participantes_348LC = bllDesSerializar_348LC.DesSerializar_348LC(dialogo_348LC.FileName);
+                dgvParticipantes.DataSource = participantes_348LC;
+                dgvParticipantes.Columns["Eliminado"].Visible = false;
+                dgvParticipantes.Columns["DVH"].Visible = false;
+                dgvParticipantes.Columns["Id"].Visible = false;
+                txtRutaDesSerializar.Text = dialogo_348LC.FileName;
+                MessageBox.Show("Participantes des-serializados correctamente.");
+            }
+            catch (InvalidOperationException)
+            {
+                MessageBox.Show("El archivo no es un XML válido de participantes.");
+            }
+            catch (Exception ex_348LC)
+            {
+                MessageBox.Show("Error al des-serializar: " + ex_348LC.Message);
+            }
+        }
+
+        private void btnLimpiar_Click(object sender, EventArgs e)
+        {
+            dgvParticipantes.DataSource = null;
         }
     }
 }

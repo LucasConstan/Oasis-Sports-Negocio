@@ -1,5 +1,4 @@
 ﻿using BLL;
-using DAL;
 using Entidades;
 using Servicios;
 using System;
@@ -8,7 +7,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,7 +19,7 @@ namespace Oasis_Sports
         {
             InitializeComponent();
             LanguageManager.GetInstance().Agregar(this);
-            
+
         }
 
         private void RegistrarClaves()
@@ -81,15 +79,21 @@ namespace Oasis_Sports
         }
 
         BLLUsuario bllUsuario = new BLLUsuario();
-        ValidadorDeIntegridad Validador = new ValidadorDeIntegridad();
-        BLL_DV bLL_DV = new BLL_DV();
+
+        private int idUsuarioSeleccionado;
+        private string nombreUsuarioSeleccionado = "";
+        private bool usuarioSeleccionadoBloqueado;
 
         public void ActualizarIdioma()
         {
             if (this.InvokeRequired)
-                this.Invoke(new Action(() => LanguageManager.GetInstance().TraducirControles(this)));
-            else
-                LanguageManager.GetInstance().TraducirControles(this);
+            {
+                this.Invoke(new Action(ActualizarIdioma));
+                return;
+            }
+
+            LanguageManager.GetInstance().TraducirControles(this);
+            ActualizarBotonBloqueo();
         }
 
         protected override void OnVisibleChanged(EventArgs e)
@@ -99,12 +103,79 @@ namespace Oasis_Sports
                 ActualizarIdioma();
         }
 
+        private void FrmGestionUsuarios_Load(object sender, EventArgs e)
+        {
+            RegistrarClaves();
+            LanguageManager.GetInstance().TraducirControles(this);
+            dataGridView1.DataBindingComplete += (s, ev) => dataGridView1.ClearSelection();
+            CargarGrilla();
+            LimpiarFormulario();
+        }
+
+        private void CargarGrilla()
+        {
+            dataGridView1.DataSource = bllUsuario.ListarActivos();
+
+            foreach (string columna in new[] { "Password", "DVH", "Eliminado" })
+            {
+                if (dataGridView1.Columns.Contains(columna))
+                    dataGridView1.Columns[columna].Visible = false;
+            }
+        }
+
+        private void LimpiarFormulario()
+        {
+            idUsuarioSeleccionado = 0;
+            nombreUsuarioSeleccionado = "";
+            usuarioSeleccionadoBloqueado = false;
+            txtUsuario.Clear();
+            txtContraseña.Clear();
+            txtContraseñaRepetida.Clear();
+            dataGridView1.ClearSelection();
+            ActualizarBotonBloqueo();
+        }
+
+        private void ActualizarBotonBloqueo()
+        {
+            btnBloqueo.Enabled = idUsuarioSeleccionado != 0;
+            btnBloqueo.Text = usuarioSeleccionadoBloqueado
+                ? LanguageManager.GetInstance().ObtenerTexto("DESBLOQUEAR")
+                : LanguageManager.GetInstance().ObtenerTexto("BLOQUEAR");
+        }
+
+        private void RegistrarEventoUsuarios(string descripcion, int criticidad)
+        {
+            new BLL_Evento().RegistrarEvento(new Evento()
+            {
+                Usuario = SessionManager.GetInstance().Usuario.Username,
+                Modulo = "Usuarios",
+                Descripcion = descripcion,
+                Fecha = DateTime.Now,
+                Criticidad = criticidad
+            });
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+                return;
+
+            Usuario usuario = (Usuario)dataGridView1.Rows[e.RowIndex].DataBoundItem;
+
+            idUsuarioSeleccionado = usuario.Id;
+            nombreUsuarioSeleccionado = usuario.Username;
+            usuarioSeleccionadoBloqueado = usuario.Bloqueado;
+
+            txtUsuario.Text = usuario.Username;
+            txtContraseña.Clear();
+            txtContraseñaRepetida.Clear();
+            ActualizarBotonBloqueo();
+        }
+
         private void btnAñadir_Click(object sender, EventArgs e)
         {
-
             string username = txtUsuario.Text.Trim();
             string password = txtContraseña.Text;
-            string passwordRepetida = txtContraseñaRepetida.Text;
 
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
@@ -112,146 +183,7 @@ namespace Oasis_Sports
                 return;
             }
 
-            if (password != passwordRepetida)
-            {
-                MessageBox.Show("Las contraseñas no coinciden.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            Usuario usuario = new Usuario()
-            {
-                Username = username,
-                Password = password 
-            };
-
-            try
-            {
-                bllUsuario.AñadirUsuario(usuario);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            BLL_Evento bllEvento = new BLL_Evento();
-            
-            
-            bllEvento.RegistrarEvento(new Evento()
-            {
-                Usuario = SessionManager.GetInstance().Usuario.Username,
-                Modulo = "Usuarios",
-                Descripcion = "Alta de usuario: " + usuario.Username,
-                Fecha = DateTime.Now,
-                Criticidad = 2
-            });
-            dataGridView1.DataSource = bllUsuario.Listar();
-            
-            MessageBox.Show("Usuario añadido correctamente");
-
-            bLL_DV.InicializarDVs();
-            
-
-
-        }
-
-        private void FrmGestionUsuarios_Load(object sender, EventArgs e)
-        {
-            RegistrarClaves();
-            LanguageManager.GetInstance().TraducirControles(this);
-            dataGridView1.DataSource = bllUsuario.Listar();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            FrmMenu frmMenu = new FrmMenu();
-            frmMenu.Show();
-            this.Hide();
-        }
-
-        private int idUsuarioSeleccionado;
-
-        private void btnEliminar_Click(object sender, EventArgs e)
-        {
-
-            if (idUsuarioSeleccionado == 0)
-            {
-                MessageBox.Show("Seleccione un usuario en la grilla.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-
-            DialogResult result = MessageBox.Show($"¿Está seguro que desea eliminar al usuario {txtUsuario.Text}?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (result != DialogResult.Yes)
-                return;
-
-            try
-            {
-                bllUsuario.EliminarUsuario(idUsuarioSeleccionado);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Operación no permitida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            MessageBox.Show("El Usuario fue eliminado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            bLL_DV.InicializarDVs();
-
-            BLL_Evento bllEvento = new BLL_Evento();
-
-            bllEvento.RegistrarEvento(new Evento()
-            {
-                Usuario = SessionManager.GetInstance().Usuario.Username,
-                Modulo = "Usuarios",
-                Descripcion = "Eliminación de usuario",
-                Fecha = DateTime.Now,
-                Criticidad = 3
-            });
-            dataGridView1.DataSource = bllUsuario.Listar();
-
-            txtUsuario.Clear();
-            txtContraseña.Clear();
-
-            bLL_DV.InicializarDVs();
-            idUsuarioSeleccionado = 0;
-            
-
-        }
-
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                DataGridViewRow fila = dataGridView1.Rows[e.RowIndex];
-
-                idUsuarioSeleccionado = Convert.ToInt32(fila.Cells["ID"].Value);
-
-                txtUsuario.Text = fila.Cells["Username"].Value.ToString();
-                txtContraseña.Text = "";
-            }
-        }
-
-        private void btnModificar_Click(object sender, EventArgs e)
-        {
-
-            if (idUsuarioSeleccionado == 0)
-            {
-                MessageBox.Show("Seleccione un usuario en la grilla.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            string username = txtUsuario.Text.Trim();
-            string password = txtContraseña.Text;
-            string passwordRepetida = txtContraseñaRepetida.Text;
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                MessageBox.Show("Para modificar, debe ingresar un nombre de usuario y una nueva contraseña.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            if (password != passwordRepetida)
+            if (password != txtContraseñaRepetida.Text)
             {
                 MessageBox.Show("Las contraseñas no coinciden.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -265,7 +197,8 @@ namespace Oasis_Sports
 
             try
             {
-                bllUsuario.ModificarUsuario(idUsuarioSeleccionado, usuario);
+                bllUsuario.AñadirUsuario(usuario);
+                RegistrarEventoUsuarios("Alta de usuario: " + usuario.Username, 2);
             }
             catch (Exception ex)
             {
@@ -273,30 +206,12 @@ namespace Oasis_Sports
                 return;
             }
 
-            BLL_Evento bllEvento = new BLL_Evento();
-            bllEvento.RegistrarEvento(new Evento()
-            {
-                Usuario = SessionManager.GetInstance().Usuario.Username,
-                Modulo = "Usuarios",
-                Descripcion = "Modificación de usuario: " + usuario.Username,
-                Fecha = DateTime.Now,
-                Criticidad = 2
-            });
-
-            dataGridView1.DataSource = bllUsuario.Listar();
-            MessageBox.Show("El Usuario fue modificado con éxito");
-            txtUsuario.Clear();
-            txtContraseña.Clear();
-            txtContraseñaRepetida.Clear();
-
-            bLL_DV.InicializarDVs();
-
-            FrmHistorialCambios frm = new FrmHistorialCambios(idUsuarioSeleccionado, usuario.Username);
-            frm.ShowDialog();
-            
+            CargarGrilla();
+            LimpiarFormulario();
+            MessageBox.Show("Usuario añadido correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void btnDesbloquear_Click(object sender, EventArgs e)
+        private void btnModificar_Click(object sender, EventArgs e)
         {
             if (idUsuarioSeleccionado == 0)
             {
@@ -304,33 +219,130 @@ namespace Oasis_Sports
                 return;
             }
 
+            string username = txtUsuario.Text.Trim();
+            string password = txtContraseña.Text;
+
+            if (string.IsNullOrEmpty(username))
+            {
+                MessageBox.Show("El nombre de usuario no puede estar vacío.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (password != txtContraseñaRepetida.Text)
+            {
+                MessageBox.Show("Las contraseñas no coinciden.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            Usuario usuario = new Usuario()
+            {
+                Username = username,
+                Password = password
+            };
+
+            string nombreAnterior = nombreUsuarioSeleccionado;
+
             try
             {
-                bllUsuario.DesbloquearUsuario(idUsuarioSeleccionado);
+                bllUsuario.ModificarUsuario(idUsuarioSeleccionado, usuario);
 
-                BLL_Evento bllEvento = new BLL_Evento();
-                bllEvento.RegistrarEvento(new Evento()
-                {
-                    Usuario = SessionManager.GetInstance().Usuario.Username,
-                    Modulo = "Usuarios",
-                    Descripcion = "Desbloqueo de usuario: " + txtUsuario.Text,
-                    Fecha = DateTime.Now,
-                    Criticidad = 2
-                });
+                string descripcion = nombreAnterior == usuario.Username
+                    ? "Modificación de usuario: " + usuario.Username
+                    : $"Modificación de usuario: {nombreAnterior} → {usuario.Username}";
 
-                dataGridView1.DataSource = bllUsuario.Listar();
-                MessageBox.Show("El usuario fue desbloqueado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (!string.IsNullOrEmpty(password))
+                    descripcion += " (con cambio de contraseña)";
+
+                RegistrarEventoUsuarios(descripcion, 2);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
+
+            CargarGrilla();
+            LimpiarFormulario();
+            MessageBox.Show("El usuario fue modificado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (idUsuarioSeleccionado == 0)
+            {
+                MessageBox.Show("Seleccione un usuario en la grilla.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult result = MessageBox.Show($"¿Está seguro que desea eliminar al usuario {nombreUsuarioSeleccionado}?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result != DialogResult.Yes)
+                return;
+
+            try
+            {
+                bllUsuario.EliminarUsuario(idUsuarioSeleccionado);
+                RegistrarEventoUsuarios("Eliminación de usuario: " + nombreUsuarioSeleccionado, 3);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Operación no permitida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            CargarGrilla();
+            LimpiarFormulario();
+            MessageBox.Show("El usuario fue eliminado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnBloqueo_Click(object sender, EventArgs e)
+        {
+            if (idUsuarioSeleccionado == 0)
+            {
+                MessageBox.Show("Seleccione un usuario en la grilla.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            bool desbloquear = usuarioSeleccionadoBloqueado;
+            string accion = desbloquear ? "desbloquear" : "bloquear";
+
+            DialogResult result = MessageBox.Show($"¿Está seguro que desea {accion} al usuario {nombreUsuarioSeleccionado}?", "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result != DialogResult.Yes)
+                return;
+
+            try
+            {
+                if (desbloquear)
+                {
+                    bllUsuario.DesbloquearUsuario(idUsuarioSeleccionado);
+                    RegistrarEventoUsuarios("Desbloqueo de usuario: " + nombreUsuarioSeleccionado, 2);
+                }
+                else
+                {
+                    bllUsuario.BloquearUsuario(idUsuarioSeleccionado);
+                    RegistrarEventoUsuarios("Bloqueo manual de usuario: " + nombreUsuarioSeleccionado, 3);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Operación no permitida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            CargarGrilla();
+            LimpiarFormulario();
+            MessageBox.Show(desbloquear ? "El usuario fue desbloqueado con éxito." : "El usuario fue bloqueado con éxito.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            FrmMenu frmMenu = new FrmMenu();
+            frmMenu.Show();
+            this.Hide();
         }
 
         private void FrmGestionUsuarios_FormClosing(object sender, FormClosingEventArgs e)
         {
             LanguageManager.GetInstance().Quitar(this);
-
         }
     }
 }

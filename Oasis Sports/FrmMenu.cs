@@ -100,6 +100,13 @@ namespace Oasis_Sports
             this.Hide();
         }
 
+        private void cAMBIARCONTRASEÑAToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FrmCambiarContraseña frmCambiarContraseña = new FrmCambiarContraseña();
+            frmCambiarContraseña.Show();
+            this.Hide();
+        }
+
         private void sALIRToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
@@ -134,8 +141,6 @@ namespace Oasis_Sports
             }
         }
 
-        BLL_Permisos permisosBLL = new BLL_Permisos();
-
         private void FrmMenu_Load(object sender, EventArgs e)
         {
             OcultarControles();
@@ -168,25 +173,54 @@ namespace Oasis_Sports
             bITACORADECAMBIOSToolStripMenuItem.Visible = false;
             mAESTROSToolStripMenuItem.Visible = false;
             gESTIONDECLASESToolStripMenuItem.Visible = false;
+            cAMBIARCONTRASEÑAToolStripMenuItem.Visible = false;
 
         }
 
         private void AplicarPermisos()
         {
-            if (SessionManager.GetInstance().IsLogged())
-            {
-                bITACORAToolStripMenuItem1.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "BTE");
-                gESTIONDEUSUARIOSToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "GUS");
-                gESTIONDERESERVASToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "GRE");
-                gESTIONDEPERFILESToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "GPE");
-                gESTIONDEIDIOMASToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "GID");
-                bITACORADECAMBIOSToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "BDC");
-                mAESTROSToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "MAE");
-                gESTIONDECLASESToolStripMenuItem.Visible = permisoBLL.UsuarioTienePermiso(SessionManager.GetInstance().Usuario.Id, "GCL");
+            if (!SessionManager.GetInstance().IsLogged())
+                return;
 
+            AplicarPermiso(gESTIONDEUSUARIOSToolStripMenuItem, "SE001");
+            AplicarPermiso(gESTIONDEPERFILESToolStripMenuItem, "SE002");
+            AplicarPermiso(bITACORAToolStripMenuItem1, "SE003");
+            AplicarPermiso(bITACORADECAMBIOSToolStripMenuItem, "SE004");
 
-                bitacoraToolStripMenuItem.Visible = true;
-            }
+            AplicarPermiso(sELECCIONARIDIOMAToolStripMenuItem, "ID001");
+            AplicarPermiso(cREARIDIOMAToolStripMenuItem, "ID002");
+
+            AplicarPermiso(eQUIPOSToolStripMenuItem, "MA001");
+            AplicarPermiso(jUGADORESToolStripMenuItem, "MA002");
+            AplicarPermiso(pROFESORESToolStripMenuItem, "MA003");
+            AplicarPermiso(pARTICIPANTESToolStripMenuItem, "MA004");
+
+            AplicarPermiso(tORNEOSToolStripMenuItem, "TO001");
+            AplicarPermiso(aSIGNAREQUIPOSToolStripMenuItem, "TO002");
+            AplicarPermiso(oRGANIZARPARTIDOSToolStripMenuItem, "TO003");
+            AplicarPermiso(rEGISTRARRESULTADOSToolStripMenuItem, "TO004");
+
+            AplicarPermiso(cREARCLASEToolStripMenuItem, "CL001");
+            AplicarPermiso(iNSCRIBIRPARTICIPANTEToolStripMenuItem, "CL002");
+            AplicarPermiso(rEGISTRARPAGOToolStripMenuItem, "CL003");
+
+            MostrarSiTieneOpciones(bitacoraToolStripMenuItem);
+            MostrarSiTieneOpciones(gESTIONDEIDIOMASToolStripMenuItem);
+            MostrarSiTieneOpciones(mAESTROSToolStripMenuItem);
+            MostrarSiTieneOpciones(gESTIONDERESERVASToolStripMenuItem);
+            MostrarSiTieneOpciones(gESTIONDECLASESToolStripMenuItem);
+
+            cAMBIARCONTRASEÑAToolStripMenuItem.Visible = true;
+        }
+
+        private void AplicarPermiso(ToolStripMenuItem item, string codigoPermiso)
+        {
+            item.Visible = permisoBLL.TienePermiso(codigoPermiso);
+        }
+
+        private void MostrarSiTieneOpciones(ToolStripMenuItem menu)
+        {
+            menu.Visible = menu.DropDownItems.Cast<ToolStripItem>().Any(i => i.Available);
         }
 
         private void gESTIONDEUSUARIOSToolStripMenuItem_Click(object sender, EventArgs e)
@@ -212,10 +246,7 @@ namespace Oasis_Sports
 
         private void bITACORADECAMBIOSToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FrmHistorialCambios frm = new FrmHistorialCambios(
-           SessionManager.GetInstance().Usuario.Id,
-           SessionManager.GetInstance().Usuario.Username);
-
+            FrmHistorialCambios frm = new FrmHistorialCambios();
             frm.ShowDialog();
         }
 

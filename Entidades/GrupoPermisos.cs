@@ -8,7 +8,7 @@ namespace Entidades
 {
     public class GrupoPermisos:ComponentePermiso
     {
-        public readonly List<ComponentePermiso> _hijos = new List<ComponentePermiso>();
+        private readonly List<ComponentePermiso> _hijos = new List<ComponentePermiso>();
 
         public void Agregar(ComponentePermiso permiso)
         {

@@ -137,10 +137,11 @@ namespace Oasis_Sports
 
                 BLL_Evento bllEvento = new BLL_Evento();
                 BLL_Permisos bllPermisos = new BLL_Permisos();
+                bllPermisos.CargarPerfil(user);
 
 
                 List<string> tablasAlteradas = bLL_DV.ObtenerTablasAlteradas();
-                bool esAdministrador = bllPermisos.EsAdministrador(user.Id);
+                bool esAdministrador = bllPermisos.EsAdministrador(user);
 
                 if (tablasAlteradas.Count > 0 && esAdministrador)
                 {
@@ -220,6 +221,8 @@ namespace Oasis_Sports
         {
             textBox2.Text = "1234";
             textBox1.Text = "Lucas";
+
+            //Prueba7  Contra: lolo78
             LanguageManager.GetInstance().TraducirControles(this);
             RegistrarClaves();
         }

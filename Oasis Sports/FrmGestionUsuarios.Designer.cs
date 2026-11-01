@@ -39,7 +39,7 @@
             btnModificar = new Button();
             btnEliminar = new Button();
             btnVolver = new Button();
-            btnDesbloquear = new Button();
+            btnBloqueo = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
             // 
@@ -157,17 +157,17 @@
             btnVolver.UseVisualStyleBackColor = false;
             btnVolver.Click += button1_Click;
             //
-            // btnDesbloquear
+            // btnBloqueo
             //
-            btnDesbloquear.BackColor = Color.White;
-            btnDesbloquear.ForeColor = Color.DarkGreen;
-            btnDesbloquear.Location = new Point(12, 392);
-            btnDesbloquear.Name = "btnDesbloquear";
-            btnDesbloquear.Size = new Size(209, 35);
-            btnDesbloquear.TabIndex = 10;
-            btnDesbloquear.Text = "DESBLOQUEAR";
-            btnDesbloquear.UseVisualStyleBackColor = false;
-            btnDesbloquear.Click += btnDesbloquear_Click;
+            btnBloqueo.BackColor = Color.White;
+            btnBloqueo.ForeColor = Color.DarkGreen;
+            btnBloqueo.Location = new Point(12, 392);
+            btnBloqueo.Name = "btnBloqueo";
+            btnBloqueo.Size = new Size(209, 35);
+            btnBloqueo.TabIndex = 10;
+            btnBloqueo.Text = "BLOQUEAR / DESBLOQUEAR";
+            btnBloqueo.UseVisualStyleBackColor = false;
+            btnBloqueo.Click += btnBloqueo_Click;
             //
             // FrmGestionUsuarios
             // 
@@ -176,7 +176,7 @@
             BackColor = Color.FromArgb(224, 224, 224);
             ClientSize = new Size(881, 482);
             Controls.Add(btnVolver);
-            Controls.Add(btnDesbloquear);
+            Controls.Add(btnBloqueo);
             Controls.Add(btnEliminar);
             Controls.Add(btnModificar);
             Controls.Add(btnAñadir);
@@ -209,6 +209,6 @@
         private Button btnModificar;
         private Button btnEliminar;
         private Button btnVolver;
-        private Button btnDesbloquear;
+        private Button btnBloqueo;
     }
 }

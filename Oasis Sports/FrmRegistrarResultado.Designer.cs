@@ -38,6 +38,7 @@
             GolesLocal = new Label();
             GolesVisitante = new Label();
             btnVolver = new Button();
+            btnReporte = new Button();
             ((System.ComponentModel.ISupportInitialize)nudGolesLocal).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudGolesVisitante).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvPartidosPendientes).BeginInit();
@@ -133,12 +134,23 @@
             btnVolver.Text = "VOLVER";
             btnVolver.UseVisualStyleBackColor = true;
             btnVolver.Click += btnVolver_Click;
-            // 
+            //
+            // btnReporte
+            //
+            btnReporte.Location = new Point(650, 287);
+            btnReporte.Name = "btnReporte";
+            btnReporte.Size = new Size(131, 38);
+            btnReporte.TabIndex = 10;
+            btnReporte.Text = "REPORTE";
+            btnReporte.UseVisualStyleBackColor = true;
+            btnReporte.Click += btnReporte_Click;
+            //
             // FrmRegistrarResultado
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnReporte);
             Controls.Add(btnVolver);
             Controls.Add(GolesVisitante);
             Controls.Add(GolesLocal);
@@ -171,5 +183,6 @@
         private Label GolesLocal;
         private Label GolesVisitante;
         private Button btnVolver;
+        private Button btnReporte;
     }
 }

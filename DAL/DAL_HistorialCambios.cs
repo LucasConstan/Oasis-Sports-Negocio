@@ -12,51 +12,70 @@ namespace DAL
 {
     public class DAL_HistorialCambios
     {
-        
-        public void Registrar(HistorialCambio cambio)
+        public void Registrar(HistorialCambio version)
         {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            {
+                cn.Open();
 
-            string query = @"INSERT INTO HistorialCambios 
-                            (EntidadId, NombreEntidad, NombreCampo, ValorAnterior, ValorNuevo, Usuario, Fecha)
-                            VALUES (@EntidadId, @NombreEntidad, @NombreCampo, @ValorAnterior, @ValorNuevo, @Usuario, @Fecha)";
+                string query = @"INSERT INTO HistorialCambios
+                                (Id_Usuario, NomUsuario, Contraseña, Bloqueado, Eliminado, Operacion, UsuarioCambio, Fecha)
+                                VALUES (@IdUsuario, @NomUsuario, @Contraseña, @Bloqueado, @Eliminado, @Operacion, @UsuarioCambio, @Fecha)";
 
-            SqlCommand cmd = new SqlCommand(query, cn);
-            cmd.Parameters.AddWithValue("@EntidadId", cambio.EntidadId);
-            cmd.Parameters.AddWithValue("@NombreEntidad", cambio.NombreEntidad);
-            cmd.Parameters.AddWithValue("@NombreCampo", cambio.NombreCampo);
-            cmd.Parameters.AddWithValue("@ValorAnterior", cambio.ValorAnterior ?? "");
-            cmd.Parameters.AddWithValue("@ValorNuevo", cambio.ValorNuevo ?? "");
-            cmd.Parameters.AddWithValue("@Usuario", cambio.Usuario);
-            cmd.Parameters.AddWithValue("@Fecha", cambio.Fecha);
-            cmd.ExecuteNonQuery();
-
-            cn.Close();
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@IdUsuario", version.IdUsuario);
+                    cmd.Parameters.AddWithValue("@NomUsuario", version.Username);
+                    cmd.Parameters.AddWithValue("@Contraseña", version.Password);
+                    cmd.Parameters.AddWithValue("@Bloqueado", version.Bloqueado);
+                    cmd.Parameters.AddWithValue("@Eliminado", version.Eliminado);
+                    cmd.Parameters.AddWithValue("@Operacion", version.Operacion);
+                    cmd.Parameters.AddWithValue("@UsuarioCambio", version.UsuarioCambio);
+                    cmd.Parameters.AddWithValue("@Fecha", version.Fecha);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
-        
-        public DataTable ObtenerPorEntidad(int entidadId, string nombreEntidad)
+        public List<HistorialCambio> ListarPorUsuario(int idUsuario)
         {
-            Conexion conexion = new Conexion();
-            SqlConnection cn = conexion.ObtenerConexion();
-            cn.Open();
+            List<HistorialCambio> lista = new List<HistorialCambio>();
 
-            string query = @"SELECT NombreCampo, ValorAnterior, ValorNuevo, Usuario, Fecha
-                             FROM HistorialCambios
-                             WHERE EntidadId = @EntidadId AND NombreEntidad = @NombreEntidad
-                             ORDER BY Fecha DESC";
+            using (SqlConnection cn = new Conexion().ObtenerConexion())
+            {
+                cn.Open();
 
-            SqlDataAdapter da = new SqlDataAdapter(query, cn);
-            da.SelectCommand.Parameters.AddWithValue("@EntidadId", entidadId);
-            da.SelectCommand.Parameters.AddWithValue("@NombreEntidad", nombreEntidad);
+                string query = @"SELECT IdHistorial, Id_Usuario, NomUsuario, Contraseña, Bloqueado, Eliminado, Operacion, UsuarioCambio, Fecha
+                                 FROM HistorialCambios
+                                 WHERE Id_Usuario = @IdUsuario
+                                 ORDER BY Fecha DESC, IdHistorial DESC";
 
-            DataTable dt = new DataTable();
-            da.Fill(dt);
+                using (SqlCommand cmd = new SqlCommand(query, cn))
+                {
+                    cmd.Parameters.AddWithValue("@IdUsuario", idUsuario);
 
-            cn.Close();
-            return dt;
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            lista.Add(new HistorialCambio
+                            {
+                                IdHistorial = Convert.ToInt32(reader["IdHistorial"]),
+                                IdUsuario = Convert.ToInt32(reader["Id_Usuario"]),
+                                Username = reader["NomUsuario"].ToString(),
+                                Password = reader["Contraseña"].ToString(),
+                                Bloqueado = Convert.ToBoolean(reader["Bloqueado"]),
+                                Eliminado = Convert.ToBoolean(reader["Eliminado"]),
+                                Operacion = reader["Operacion"].ToString(),
+                                UsuarioCambio = reader["UsuarioCambio"].ToString(),
+                                Fecha = Convert.ToDateTime(reader["Fecha"])
+                            });
+                        }
+                    }
+                }
+            }
+
+            return lista;
         }
     }
 }

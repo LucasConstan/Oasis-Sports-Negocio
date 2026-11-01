@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DAL;
 using Servicios;
-using System.Windows.Forms;
 
 namespace BLL
 {
@@ -16,31 +15,43 @@ namespace BLL
             return DAL_Usuario.Listar();
         }
 
+        public List<Usuario> ListarActivos()
+        {
+            return DAL_Usuario.Listar().Where(u => !u.Eliminado).OrderBy(u => u.Username).ToList();
+        }
+
         public void AñadirUsuario(Usuario usuario)
         {
-            ValidarDatosUsuario(usuario, 0);
+            ValidarDatosUsuario(usuario, 0, true);
             DAL_Usuario.AñadirUsuario(usuario);
+
+            Usuario creado = DAL_Usuario.ObtenerPorUsuario(usuario.Username);
+            if (creado != null)
+            {
+                new BLL_DV().RecalcularYGuardar(creado);
+                new BLL_HistorialCambios().RegistrarVersion(creado.Id, "Alta");
+            }
         }
 
         public void ModificarUsuario(int idUsuario, Usuario usuarioNuevo)
         {
-            Usuario usuarioAntes = ObtenerUsuarioActivo(idUsuario);
-            ValidarDatosUsuario(usuarioNuevo, idUsuario);
+            ObtenerUsuarioActivo(idUsuario);
 
-            DAL_Usuario.ModificarUsuario(idUsuario, usuarioNuevo);
+            bool cambiaContraseña = !string.IsNullOrEmpty(usuarioNuevo.Password);
+            ValidarDatosUsuario(usuarioNuevo, idUsuario, cambiaContraseña);
 
-            Usuario usuarioDespues = new Usuario
-            {
-                Id = idUsuario,
-                Username = usuarioNuevo.Username,
-                Password = encriptador.Encriptar(usuarioNuevo.Password),
-                Bloqueado = usuarioAntes.Bloqueado,
-                Eliminado = usuarioAntes.Eliminado
-            };
+            if (cambiaContraseña)
+                DAL_Usuario.ModificarUsuario(idUsuario, usuarioNuevo);
+            else
+                DAL_Usuario.ModificarNombreUsuario(idUsuario, usuarioNuevo.Username);
 
-            BLL_HistorialCambios bllHistorial = new BLL_HistorialCambios();
-            string quienModifica = Servicios.SessionManager.GetInstance().Usuario?.Username ?? "sistema";
-            bllHistorial.RegistrarCambiosUsuario(usuarioAntes, usuarioDespues, quienModifica);
+            new BLL_DV().RecalcularYGuardar(ObtenerUsuarioActivo(idUsuario));
+
+            Usuario usuarioSesion = SessionManager.GetInstance().Usuario;
+            if (usuarioSesion != null && usuarioSesion.Id == idUsuario)
+                usuarioSesion.Username = usuarioNuevo.Username;
+
+            new BLL_HistorialCambios().RegistrarVersion(idUsuario, "Modificación");
         }
 
         private Usuario ObtenerUsuarioActivo(int idUsuario)
@@ -53,7 +64,7 @@ namespace BLL
             return usuario;
         }
 
-        private void ValidarDatosUsuario(Usuario usuario, int idUsuario)
+        private void ValidarDatosUsuario(Usuario usuario, int idUsuario, bool validarContraseña)
         {
             if (string.IsNullOrWhiteSpace(usuario.Username))
                 throw new Exception("El nombre de usuario es obligatorio.");
@@ -66,14 +77,8 @@ namespace BLL
             if (!usuario.Username.All(char.IsLetterOrDigit))
                 throw new Exception("El nombre de usuario solo puede contener letras y números, sin espacios.");
 
-            if (string.IsNullOrEmpty(usuario.Password))
-                throw new Exception("La contraseña es obligatoria.");
-
-            if (usuario.Password.Length < 6)
-                throw new Exception("La contraseña debe tener al menos 6 caracteres.");
-
-            if (!usuario.Password.Any(char.IsLetter) || !usuario.Password.Any(char.IsDigit))
-                throw new Exception("La contraseña debe contener al menos una letra y un número.");
+            if (validarContraseña)
+                ValidarFormatoContraseña(usuario.Password);
 
             bool duplicado = DAL_Usuario.Listar().Any(u =>
                 !u.Eliminado &&
@@ -82,6 +87,53 @@ namespace BLL
 
             if (duplicado)
                 throw new Exception("Ya existe un usuario con ese nombre.");
+        }
+
+        private void ValidarFormatoContraseña(string contraseña)
+        {
+            if (string.IsNullOrEmpty(contraseña))
+                throw new Exception("La contraseña es obligatoria.");
+
+            if (contraseña.Length < 6)
+                throw new Exception("La contraseña debe tener al menos 6 caracteres.");
+
+            if (!contraseña.Any(char.IsLetter) || !contraseña.Any(char.IsDigit))
+                throw new Exception("La contraseña debe contener al menos una letra y un número.");
+        }
+
+        public void CambiarContraseña(int idUsuario, string contraseñaActual, string contraseñaNueva, string confirmacion)
+        {
+            if (string.IsNullOrEmpty(contraseñaActual))
+                throw new Exception("Debe ingresar la contraseña actual.");
+
+            if (string.IsNullOrEmpty(contraseñaNueva))
+                throw new Exception("Debe ingresar la nueva contraseña.");
+
+            if (string.IsNullOrEmpty(confirmacion))
+                throw new Exception("Debe confirmar la nueva contraseña.");
+
+            Usuario usuario = ObtenerUsuarioActivo(idUsuario);
+
+            if (usuario.Bloqueado)
+                throw new Exception("El usuario se encuentra bloqueado.");
+
+            if (usuario.Password != encriptador.Encriptar(contraseñaActual))
+                throw new Exception("La contraseña actual es incorrecta.");
+
+            if (contraseñaNueva != confirmacion)
+                throw new Exception("La nueva contraseña y su confirmación no coinciden.");
+
+            if (contraseñaNueva == contraseñaActual)
+                throw new Exception("La nueva contraseña debe ser distinta de la actual.");
+
+            ValidarFormatoContraseña(contraseñaNueva);
+
+            DAL_Usuario.CambiarContraseña(idUsuario, contraseñaNueva);
+
+            usuario.Password = encriptador.Encriptar(contraseñaNueva);
+            new BLL_DV().RecalcularYGuardar(usuario);
+
+            new BLL_HistorialCambios().RegistrarVersion(idUsuario, "Cambio de contraseña");
         }
 
         public const int ID_USUARIO_ADMIN = 11;
@@ -94,9 +146,37 @@ namespace BLL
             if (SessionManager.GetInstance().Usuario?.Id == idUsuario)
                 throw new Exception("No puede eliminar al usuario con el que está logueado actualmente.");
 
-            ObtenerUsuarioActivo(idUsuario);
+            Usuario usuario = ObtenerUsuarioActivo(idUsuario);
 
             DAL_Usuario.EliminarUsuario(idUsuario);
+
+            usuario.Eliminado = true;
+            new BLL_DV().RecalcularYGuardar(usuario);
+            intentosFallidos.Remove(idUsuario);
+
+            new BLL_HistorialCambios().RegistrarVersion(idUsuario, "Baja");
+        }
+
+        public void BloquearUsuario(int idUsuario)
+        {
+            if (idUsuario == ID_USUARIO_ADMIN)
+                throw new Exception("El usuario administrador del sistema no puede bloquearse.");
+
+            if (SessionManager.GetInstance().Usuario?.Id == idUsuario)
+                throw new Exception("No puede bloquear al usuario con el que está logueado actualmente.");
+
+            Usuario usuario = ObtenerUsuarioActivo(idUsuario);
+
+            if (usuario.Bloqueado)
+                throw new Exception("El usuario ya se encuentra bloqueado.");
+
+            DAL_Usuario.BloquearUsuario(idUsuario);
+
+            usuario.Bloqueado = true;
+            new BLL_DV().RecalcularYGuardar(usuario);
+            intentosFallidos.Remove(idUsuario);
+
+            new BLL_HistorialCambios().RegistrarVersion(idUsuario, "Bloqueo manual");
         }
 
         public void DesbloquearUsuario(int idUsuario)
@@ -123,8 +203,7 @@ namespace BLL
             new BLL_DV().RecalcularYGuardar(usuarioDespues);
             intentosFallidos.Remove(idUsuario);
 
-            string quienModifica = Servicios.SessionManager.GetInstance().Usuario?.Username ?? "sistema";
-            new BLL_HistorialCambios().RegistrarCambiosUsuario(usuarioAntes, usuarioDespues, quienModifica);
+            new BLL_HistorialCambios().RegistrarVersion(idUsuario, "Desbloqueo");
         }
 
         private Encriptacion encriptador = new Encriptacion();
@@ -164,6 +243,7 @@ namespace BLL
                     DAL_Usuario.BloquearUsuario(usuario.Id);
                     usuario.Bloqueado = true;
                     new BLL_DV().RecalcularYGuardar(usuario);
+                    new BLL_HistorialCambios().RegistrarVersion(usuario.Id, "Bloqueo por intentos fallidos");
                     throw new Exception("Usuario bloqueado por exceso de intentos.");
                 }
 

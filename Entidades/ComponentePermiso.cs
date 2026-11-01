@@ -15,5 +15,10 @@ namespace Entidades
 
         public abstract bool TienePermiso(string codigoPermiso);
         public abstract List<ComponentePermiso> ObtenerHijos();
+
+        public override string ToString()
+        {
+            return $"{Codigo} - {Nombre}";
+        }
     }
 }

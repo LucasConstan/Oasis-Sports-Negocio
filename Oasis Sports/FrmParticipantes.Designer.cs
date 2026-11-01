@@ -45,6 +45,11 @@ namespace Oasis_Sports
             txtDireccion = new TextBox();
             lblDireccion = new Label();
             dgvParticipantes = new DataGridView();
+            btnSerializar = new Button();
+            txtRutaSerializar = new TextBox();
+            btnDesSerializar = new Button();
+            txtRutaDesSerializar = new TextBox();
+            btnLimpiar = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvParticipantes).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudEdad).BeginInit();
             SuspendLayout();
@@ -215,11 +220,68 @@ namespace Oasis_Sports
             dgvParticipantes.TabIndex = 0;
             dgvParticipantes.SelectionChanged += dgvParticipantes_SelectionChanged;
             //
+            // btnSerializar
+            //
+            btnSerializar.BackColor = Color.White;
+            btnSerializar.ForeColor = Color.DarkGreen;
+            btnSerializar.Location = new Point(880, 13);
+            btnSerializar.Name = "btnSerializar";
+            btnSerializar.Size = new Size(209, 35);
+            btnSerializar.TabIndex = 17;
+            btnSerializar.Text = "SERIALIZAR";
+            btnSerializar.UseVisualStyleBackColor = false;
+            btnSerializar.Click += btnSerializar_Click;
+            //
+            // txtRutaSerializar
+            //
+            txtRutaSerializar.Location = new Point(880, 54);
+            txtRutaSerializar.Name = "txtRutaSerializar";
+            txtRutaSerializar.ReadOnly = true;
+            txtRutaSerializar.Size = new Size(209, 29);
+            txtRutaSerializar.TabIndex = 18;
+            //
+            // btnDesSerializar
+            //
+            btnDesSerializar.BackColor = Color.White;
+            btnDesSerializar.ForeColor = Color.DarkGreen;
+            btnDesSerializar.Location = new Point(880, 100);
+            btnDesSerializar.Name = "btnDesSerializar";
+            btnDesSerializar.Size = new Size(209, 35);
+            btnDesSerializar.TabIndex = 19;
+            btnDesSerializar.Text = "DES-SERIALIZAR";
+            btnDesSerializar.UseVisualStyleBackColor = false;
+            btnDesSerializar.Click += btnDesSerializar_Click;
+            //
+            // txtRutaDesSerializar
+            //
+            txtRutaDesSerializar.Location = new Point(880, 141);
+            txtRutaDesSerializar.Name = "txtRutaDesSerializar";
+            txtRutaDesSerializar.ReadOnly = true;
+            txtRutaDesSerializar.Size = new Size(209, 29);
+            txtRutaDesSerializar.TabIndex = 20;
+            //
+            // btnLimpiar
+            //
+            btnLimpiar.BackColor = Color.White;
+            btnLimpiar.ForeColor = Color.DarkGreen;
+            btnLimpiar.Location = new Point(880, 187);
+            btnLimpiar.Name = "btnLimpiar";
+            btnLimpiar.Size = new Size(209, 35);
+            btnLimpiar.TabIndex = 21;
+            btnLimpiar.Text = "LIMPIAR";
+            btnLimpiar.UseVisualStyleBackColor = false;
+            btnLimpiar.Click += btnLimpiar_Click;
+            //
             // FrmParticipantes
             //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(874, 645);
+            ClientSize = new Size(1105, 645);
+            Controls.Add(btnLimpiar);
+            Controls.Add(txtRutaDesSerializar);
+            Controls.Add(btnDesSerializar);
+            Controls.Add(txtRutaSerializar);
+            Controls.Add(btnSerializar);
             Controls.Add(txtDireccion);
             Controls.Add(lblDireccion);
             Controls.Add(txtTelefono);
@@ -265,5 +327,10 @@ namespace Oasis_Sports
         private TextBox txtDireccion;
         private Label lblDireccion;
         private DataGridView dgvParticipantes;
+        private Button btnSerializar;
+        private TextBox txtRutaSerializar;
+        private Button btnDesSerializar;
+        private TextBox txtRutaDesSerializar;
+        private Button btnLimpiar;
     }
 }

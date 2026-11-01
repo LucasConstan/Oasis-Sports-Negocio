@@ -12,97 +12,104 @@ namespace BLL
     public class BLL_HistorialCambios
     {
         DAL_HistorialCambios dal = new DAL_HistorialCambios();
+        DAL_Usuario dalUsuario = new DAL_Usuario();
 
-      
-        public void RegistrarCambiosUsuario(Usuario antes, Usuario despues, string usuarioQueModifica)
+        public void RegistrarVersion(int idUsuario, string operacion)
         {
-            if (antes.Username != despues.Username)
-            {
-                dal.Registrar(new HistorialCambio
-                {
-                    EntidadId = antes.Id,
-                    NombreEntidad = "Usuario",
-                    NombreCampo = "Username",
-                    ValorAnterior = antes.Username,
-                    ValorNuevo = despues.Username,
-                    Usuario = usuarioQueModifica,
-                    Fecha = DateTime.Now
-                });
-            }
+            Usuario usuario = dalUsuario.Listar().FirstOrDefault(u => u.Id == idUsuario);
 
-            if (antes.Password != despues.Password)
-            {
-                dal.Registrar(new HistorialCambio
-                {
-                    EntidadId = antes.Id,
-                    NombreEntidad = "Usuario",
-                    NombreCampo = "Password",
-                    ValorAnterior = "***",   
-                    ValorNuevo = "***",
-                    Usuario = usuarioQueModifica,
-                    Fecha = DateTime.Now
-                });
-            }
+            if (usuario == null)
+                throw new Exception("No se encontró el usuario para registrar el historial.");
 
-            if (antes.Bloqueado != despues.Bloqueado)
+            dal.Registrar(new HistorialCambio
             {
-                dal.Registrar(new HistorialCambio
-                {
-                    EntidadId = antes.Id,
-                    NombreEntidad = "Usuario",
-                    NombreCampo = "Bloqueado",
-                    ValorAnterior = antes.Bloqueado ? "Sí" : "No",
-                    ValorNuevo = despues.Bloqueado ? "Sí" : "No",
-                    Usuario = usuarioQueModifica,
-                    Fecha = DateTime.Now
-                });
-            }
+                IdUsuario = usuario.Id,
+                Username = usuario.Username,
+                Password = usuario.Password,
+                Bloqueado = usuario.Bloqueado,
+                Eliminado = usuario.Eliminado,
+                Operacion = operacion,
+                UsuarioCambio = Servicios.SessionManager.GetInstance().Usuario?.Username ?? "sistema",
+                Fecha = DateTime.Now
+            });
         }
 
-        public DataTable ObtenerHistorialUsuario(int idUsuario)
+        public List<HistorialCambio> ListarHistorial(int idUsuario)
         {
-            return dal.ObtenerPorEntidad(idUsuario, "Usuario");
+            return dal.ListarPorUsuario(idUsuario);
         }
 
-        public void RestaurarCampo(int idUsuario, string campo, string valorAnterior, string usuarioQueRestaura)
+        public string DescribirCambios(HistorialCambio version, HistorialCambio? anterior)
         {
-            List<Usuario> usuarios = new DAL_Usuario().Listar();
-            Usuario usuario = usuarios.FirstOrDefault(u => u.Id == idUsuario);
+            if (anterior == null)
+                return "Versión inicial";
 
-            if (usuario == null || usuario.Eliminado)
-                throw new Exception("El usuario no existe o fue eliminado.");
+            List<string> cambios = new List<string>();
 
-            if (campo == "Username")
+            if (version.Username != anterior.Username)
+                cambios.Add($"Nombre: {anterior.Username} → {version.Username}");
+
+            if (version.Password != anterior.Password)
+                cambios.Add("Contraseña modificada");
+
+            if (version.Bloqueado != anterior.Bloqueado)
+                cambios.Add($"Bloqueado: {(anterior.Bloqueado ? "Sí" : "No")} → {(version.Bloqueado ? "Sí" : "No")}");
+
+            if (version.Eliminado != anterior.Eliminado)
+                cambios.Add($"Eliminado: {(anterior.Eliminado ? "Sí" : "No")} → {(version.Eliminado ? "Sí" : "No")}");
+
+            return cambios.Count == 0 ? "Sin cambios" : string.Join("; ", cambios);
+        }
+
+        public void RestaurarVersion(int idUsuario, int idHistorial)
+        {
+            HistorialCambio version = dal.ListarPorUsuario(idUsuario).FirstOrDefault(h => h.IdHistorial == idHistorial);
+
+            if (version == null)
+                throw new Exception("La versión seleccionada no existe.");
+
+            List<Usuario> usuarios = dalUsuario.Listar();
+            Usuario actual = usuarios.FirstOrDefault(u => u.Id == idUsuario);
+
+            if (actual == null)
+                throw new Exception("El usuario no existe.");
+
+            if (Servicios.SessionManager.GetInstance().Usuario?.Id == idUsuario)
+                throw new Exception("No puede restaurar el usuario con el que está logueado actualmente.");
+
+            if (actual.Username == version.Username &&
+                actual.Password == version.Password &&
+                actual.Bloqueado == version.Bloqueado &&
+                actual.Eliminado == version.Eliminado)
+                throw new Exception("El usuario ya se encuentra en el estado de esa versión.");
+
+            if (idUsuario == BLLUsuario.ID_USUARIO_ADMIN && (version.Bloqueado || version.Eliminado))
+                throw new Exception("El usuario administrador del sistema no puede quedar bloqueado ni eliminado.");
+
+            if (!version.Eliminado)
             {
-                if (string.IsNullOrWhiteSpace(valorAnterior))
-                    throw new Exception("No se puede restaurar un nombre de usuario vacío.");
-
                 bool enUso = usuarios.Any(u =>
                     !u.Eliminado &&
                     u.Id != idUsuario &&
-                    u.Username.Trim().Equals(valorAnterior.Trim(), StringComparison.OrdinalIgnoreCase));
+                    u.Username.Trim().Equals(version.Username.Trim(), StringComparison.OrdinalIgnoreCase));
 
                 if (enUso)
-                    throw new Exception($"No se puede restaurar: el nombre '{valorAnterior}' ya lo usa otro usuario.");
+                    throw new Exception($"No se puede restaurar: el nombre '{version.Username}' ya lo usa otro usuario.");
             }
 
-            if (campo == "Bloqueado" && idUsuario == BLLUsuario.ID_USUARIO_ADMIN && valorAnterior == "Sí")
-                throw new Exception("No se puede bloquear al usuario administrador del sistema.");
-
-            DAL_DV dal_DV = new DAL_DV();
-            dal_DV.RestaurarCampo(idUsuario, campo, valorAnterior);
-
-           
-            dal.Registrar(new HistorialCambio
+            Usuario restaurado = new Usuario
             {
-                EntidadId = idUsuario,
-                NombreEntidad = "Usuario",
-                NombreCampo = campo,
-                ValorAnterior = "(restauración)",
-                ValorNuevo = valorAnterior,
-                Usuario = usuarioQueRestaura,
-                Fecha = DateTime.Now
-            });
+                Id = idUsuario,
+                Username = version.Username,
+                Password = version.Password,
+                Bloqueado = version.Bloqueado,
+                Eliminado = version.Eliminado
+            };
+
+            dalUsuario.Restaurar(restaurado);
+            new BLL_DV().RecalcularYGuardar(restaurado);
+
+            RegistrarVersion(idUsuario, $"Restauración (versión del {version.Fecha:dd/MM/yyyy HH:mm:ss})");
         }
     }
 }

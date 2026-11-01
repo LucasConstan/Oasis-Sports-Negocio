@@ -28,199 +28,297 @@
         /// </summary>
         private void InitializeComponent()
         {
-            textBox1 = new TextBox();
-            label1 = new Label();
-            lstPermisosDisponibles = new ListBox();
-            groupBox1 = new GroupBox();
-            groupBox2 = new GroupBox();
-            lstPermisosDelGrupo = new ListBox();
-            btnAgregar = new Button();
-            btnQuitar = new Button();
-            btnGuardar = new Button();
+            lblTituloGrupos = new Label();
+            lblEstadoGrupo = new Label();
+            lblCodigo = new Label();
+            txtCodigo = new TextBox();
+            lblNombreGrupo = new Label();
+            txtNombreGrupo = new TextBox();
+            lblAyudaCodigo = new Label();
+            grpDisponibles = new GroupBox();
+            treePermisosDisponibles = new TreeView();
+            grpContenidoGrupo = new GroupBox();
+            treePermisosDelGrupo = new TreeView();
+            btnAgregarAlGrupo = new Button();
+            btnQuitarDelGrupo = new Button();
+            lblAyudaDisponibles = new Label();
+            lblAyudaContenido = new Label();
+            lblLeyendaPerfil = new Label();
+            btnEditarGrupo = new Button();
+            btnEliminarGrupo = new Button();
+            btnNuevoGrupo = new Button();
+            btnGuardarGrupo = new Button();
             btnVolver = new Button();
-            btnModificar = new Button();
-            lblmodo = new Label();
-            btnNuevo = new Button();
-            btnEliminar = new Button();
-            groupBox1.SuspendLayout();
-            groupBox2.SuspendLayout();
+            grpDisponibles.SuspendLayout();
+            grpContenidoGrupo.SuspendLayout();
             SuspendLayout();
-            // 
-            // textBox1
-            // 
-            textBox1.Location = new Point(329, 44);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(154, 29);
-            textBox1.TabIndex = 0;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Location = new Point(171, 47);
-            label1.Name = "label1";
-            label1.Size = new Size(152, 21);
-            label1.TabIndex = 1;
-            label1.Text = "Nombre de grupo: ";
-            // 
-            // lstPermisosDisponibles
-            // 
-            lstPermisosDisponibles.FormattingEnabled = true;
-            lstPermisosDisponibles.ItemHeight = 21;
-            lstPermisosDisponibles.Location = new Point(30, 22);
-            lstPermisosDisponibles.Name = "lstPermisosDisponibles";
-            lstPermisosDisponibles.Size = new Size(182, 256);
-            lstPermisosDisponibles.TabIndex = 2;
-            lstPermisosDisponibles.SelectedIndexChanged += lstPermisosDisponibles_SelectedIndexChanged;
-            // 
-            // groupBox1
-            // 
-            groupBox1.Controls.Add(lstPermisosDisponibles);
-            groupBox1.Location = new Point(51, 103);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(244, 293);
-            groupBox1.TabIndex = 3;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Permisos disponibles";
-            // 
-            // groupBox2
-            // 
-            groupBox2.Controls.Add(lstPermisosDelGrupo);
-            groupBox2.Location = new Point(504, 103);
-            groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(240, 293);
-            groupBox2.TabIndex = 4;
-            groupBox2.TabStop = false;
-            groupBox2.Text = "Permisos del grupo";
-            // 
-            // lstPermisosDelGrupo
-            // 
-            lstPermisosDelGrupo.FormattingEnabled = true;
-            lstPermisosDelGrupo.ItemHeight = 21;
-            lstPermisosDelGrupo.Location = new Point(30, 22);
-            lstPermisosDelGrupo.Name = "lstPermisosDelGrupo";
-            lstPermisosDelGrupo.Size = new Size(182, 256);
-            lstPermisosDelGrupo.TabIndex = 2;
-            // 
-            // btnAgregar
-            // 
-            btnAgregar.Location = new Point(330, 113);
-            btnAgregar.Name = "btnAgregar";
-            btnAgregar.Size = new Size(153, 38);
-            btnAgregar.TabIndex = 5;
-            btnAgregar.Text = "AGREGAR";
-            btnAgregar.UseVisualStyleBackColor = true;
-            btnAgregar.Click += btnAgregar_Click;
-            // 
-            // btnQuitar
-            // 
-            btnQuitar.Location = new Point(330, 166);
-            btnQuitar.Name = "btnQuitar";
-            btnQuitar.Size = new Size(153, 38);
-            btnQuitar.TabIndex = 6;
-            btnQuitar.Text = "QUITAR";
-            btnQuitar.UseVisualStyleBackColor = true;
-            btnQuitar.Click += btnQuitar_Click;
-            // 
-            // btnGuardar
-            // 
-            btnGuardar.Location = new Point(329, 276);
-            btnGuardar.Name = "btnGuardar";
-            btnGuardar.Size = new Size(153, 38);
-            btnGuardar.TabIndex = 7;
-            btnGuardar.Text = "GUARDAR";
-            btnGuardar.UseVisualStyleBackColor = true;
-            btnGuardar.Click += btnGuardar_Click;
-            // 
+            //
+            // lblTituloGrupos
+            //
+            lblTituloGrupos.AutoSize = true;
+            lblTituloGrupos.Font = new Font("Times New Roman", 16F, FontStyle.Bold);
+            lblTituloGrupos.Location = new Point(12, 10);
+            lblTituloGrupos.Name = "lblTituloGrupos";
+            lblTituloGrupos.Size = new Size(230, 25);
+            lblTituloGrupos.TabIndex = 0;
+            lblTituloGrupos.Text = "GRUPOS DE PERMISOS";
+            //
+            // lblEstadoGrupo
+            //
+            lblEstadoGrupo.AutoSize = true;
+            lblEstadoGrupo.Font = new Font("Times New Roman", 14F, FontStyle.Bold);
+            lblEstadoGrupo.ForeColor = Color.DarkBlue;
+            lblEstadoGrupo.Location = new Point(12, 48);
+            lblEstadoGrupo.Name = "lblEstadoGrupo";
+            lblEstadoGrupo.Size = new Size(0, 21);
+            lblEstadoGrupo.TabIndex = 1;
+            //
+            // lblCodigo
+            //
+            lblCodigo.AutoSize = true;
+            lblCodigo.Location = new Point(12, 88);
+            lblCodigo.Name = "lblCodigo";
+            lblCodigo.Size = new Size(72, 21);
+            lblCodigo.TabIndex = 2;
+            lblCodigo.Text = "Código: ";
+            //
+            // txtCodigo
+            //
+            txtCodigo.CharacterCasing = CharacterCasing.Upper;
+            txtCodigo.Location = new Point(95, 85);
+            txtCodigo.MaxLength = 5;
+            txtCodigo.Name = "txtCodigo";
+            txtCodigo.Size = new Size(90, 29);
+            txtCodigo.TabIndex = 3;
+            txtCodigo.TextChanged += txtGrupo_TextChanged;
+            //
+            // lblNombreGrupo
+            //
+            lblNombreGrupo.AutoSize = true;
+            lblNombreGrupo.Location = new Point(205, 88);
+            lblNombreGrupo.Name = "lblNombreGrupo";
+            lblNombreGrupo.Size = new Size(76, 21);
+            lblNombreGrupo.TabIndex = 4;
+            lblNombreGrupo.Text = "Nombre:";
+            //
+            // txtNombreGrupo
+            //
+            txtNombreGrupo.Location = new Point(290, 85);
+            txtNombreGrupo.MaxLength = 100;
+            txtNombreGrupo.Name = "txtNombreGrupo";
+            txtNombreGrupo.Size = new Size(400, 29);
+            txtNombreGrupo.TabIndex = 5;
+            txtNombreGrupo.TextChanged += txtGrupo_TextChanged;
+            //
+            // lblAyudaCodigo
+            //
+            lblAyudaCodigo.AutoSize = true;
+            lblAyudaCodigo.Font = new Font("Times New Roman", 10F, FontStyle.Italic);
+            lblAyudaCodigo.Location = new Point(95, 118);
+            lblAyudaCodigo.Name = "lblAyudaCodigo";
+            lblAyudaCodigo.Size = new Size(280, 15);
+            lblAyudaCodigo.TabIndex = 6;
+            lblAyudaCodigo.Text = "El código lleva 2 letras y 3 números (ej.: GE050)";
+            //
+            // grpDisponibles
+            //
+            grpDisponibles.Controls.Add(treePermisosDisponibles);
+            grpDisponibles.Location = new Point(12, 150);
+            grpDisponibles.Name = "grpDisponibles";
+            grpDisponibles.Size = new Size(425, 320);
+            grpDisponibles.TabIndex = 7;
+            grpDisponibles.TabStop = false;
+            grpDisponibles.Text = "Grupos y permisos existentes";
+            //
+            // treePermisosDisponibles
+            //
+            treePermisosDisponibles.Font = new Font("Times New Roman", 14F, FontStyle.Bold);
+            treePermisosDisponibles.HideSelection = false;
+            treePermisosDisponibles.Location = new Point(10, 28);
+            treePermisosDisponibles.Name = "treePermisosDisponibles";
+            treePermisosDisponibles.ShowNodeToolTips = true;
+            treePermisosDisponibles.Size = new Size(405, 282);
+            treePermisosDisponibles.TabIndex = 0;
+            treePermisosDisponibles.AfterSelect += treePermisos_AfterSelect;
+            treePermisosDisponibles.NodeMouseDoubleClick += treePermisosDisponibles_NodeMouseDoubleClick;
+            //
+            // grpContenidoGrupo
+            //
+            grpContenidoGrupo.Controls.Add(treePermisosDelGrupo);
+            grpContenidoGrupo.Location = new Point(573, 150);
+            grpContenidoGrupo.Name = "grpContenidoGrupo";
+            grpContenidoGrupo.Size = new Size(425, 320);
+            grpContenidoGrupo.TabIndex = 10;
+            grpContenidoGrupo.TabStop = false;
+            grpContenidoGrupo.Text = "Contenido del grupo";
+            //
+            // treePermisosDelGrupo
+            //
+            treePermisosDelGrupo.Font = new Font("Times New Roman", 14F, FontStyle.Bold);
+            treePermisosDelGrupo.HideSelection = false;
+            treePermisosDelGrupo.Location = new Point(10, 28);
+            treePermisosDelGrupo.Name = "treePermisosDelGrupo";
+            treePermisosDelGrupo.Size = new Size(405, 282);
+            treePermisosDelGrupo.TabIndex = 0;
+            treePermisosDelGrupo.AfterSelect += treePermisos_AfterSelect;
+            treePermisosDelGrupo.NodeMouseDoubleClick += treePermisosDelGrupo_NodeMouseDoubleClick;
+            //
+            // btnAgregarAlGrupo
+            //
+            btnAgregarAlGrupo.Location = new Point(447, 250);
+            btnAgregarAlGrupo.Name = "btnAgregarAlGrupo";
+            btnAgregarAlGrupo.Size = new Size(116, 40);
+            btnAgregarAlGrupo.TabIndex = 8;
+            btnAgregarAlGrupo.Text = "Agregar >";
+            btnAgregarAlGrupo.UseVisualStyleBackColor = true;
+            btnAgregarAlGrupo.Click += btnAgregar_Click;
+            //
+            // btnQuitarDelGrupo
+            //
+            btnQuitarDelGrupo.Location = new Point(447, 300);
+            btnQuitarDelGrupo.Name = "btnQuitarDelGrupo";
+            btnQuitarDelGrupo.Size = new Size(116, 40);
+            btnQuitarDelGrupo.TabIndex = 9;
+            btnQuitarDelGrupo.Text = "< Quitar";
+            btnQuitarDelGrupo.UseVisualStyleBackColor = true;
+            btnQuitarDelGrupo.Click += btnQuitar_Click;
+            //
+            // lblAyudaDisponibles
+            //
+            lblAyudaDisponibles.AutoSize = true;
+            lblAyudaDisponibles.Font = new Font("Times New Roman", 10F, FontStyle.Italic);
+            lblAyudaDisponibles.Location = new Point(12, 475);
+            lblAyudaDisponibles.Name = "lblAyudaDisponibles";
+            lblAyudaDisponibles.Size = new Size(190, 15);
+            lblAyudaDisponibles.TabIndex = 11;
+            lblAyudaDisponibles.Text = "Doble clic para agregar al grupo";
+            //
+            // lblLeyendaPerfil
+            //
+            lblLeyendaPerfil.AutoSize = true;
+            lblLeyendaPerfil.Font = new Font("Times New Roman", 10F, FontStyle.Bold | FontStyle.Italic);
+            lblLeyendaPerfil.ForeColor = Color.DarkBlue;
+            lblLeyendaPerfil.Location = new Point(215, 475);
+            lblLeyendaPerfil.Name = "lblLeyendaPerfil";
+            lblLeyendaPerfil.Size = new Size(220, 15);
+            lblLeyendaPerfil.TabIndex = 18;
+            lblLeyendaPerfil.Text = "En azul: grupos asignados como perfil";
+            //
+            // lblAyudaContenido
+            //
+            lblAyudaContenido.AutoSize = true;
+            lblAyudaContenido.Font = new Font("Times New Roman", 10F, FontStyle.Italic);
+            lblAyudaContenido.Location = new Point(573, 475);
+            lblAyudaContenido.Name = "lblAyudaContenido";
+            lblAyudaContenido.Size = new Size(190, 15);
+            lblAyudaContenido.TabIndex = 12;
+            lblAyudaContenido.Text = "Doble clic para quitar del grupo";
+            //
+            // btnEditarGrupo
+            //
+            btnEditarGrupo.Location = new Point(12, 505);
+            btnEditarGrupo.Name = "btnEditarGrupo";
+            btnEditarGrupo.Size = new Size(180, 40);
+            btnEditarGrupo.TabIndex = 13;
+            btnEditarGrupo.Text = "Editar grupo";
+            btnEditarGrupo.UseVisualStyleBackColor = true;
+            btnEditarGrupo.Click += btnModificar_Click;
+            //
+            // btnEliminarGrupo
+            //
+            btnEliminarGrupo.Location = new Point(202, 505);
+            btnEliminarGrupo.Name = "btnEliminarGrupo";
+            btnEliminarGrupo.Size = new Size(180, 40);
+            btnEliminarGrupo.TabIndex = 14;
+            btnEliminarGrupo.Text = "Eliminar grupo";
+            btnEliminarGrupo.UseVisualStyleBackColor = true;
+            btnEliminarGrupo.Click += btnEliminar_Click;
+            //
+            // btnNuevoGrupo
+            //
+            btnNuevoGrupo.Location = new Point(573, 505);
+            btnNuevoGrupo.Name = "btnNuevoGrupo";
+            btnNuevoGrupo.Size = new Size(205, 40);
+            btnNuevoGrupo.TabIndex = 15;
+            btnNuevoGrupo.Text = "Nuevo grupo";
+            btnNuevoGrupo.UseVisualStyleBackColor = true;
+            btnNuevoGrupo.Click += btnNuevo_Click;
+            //
+            // btnGuardarGrupo
+            //
+            btnGuardarGrupo.Location = new Point(788, 505);
+            btnGuardarGrupo.Name = "btnGuardarGrupo";
+            btnGuardarGrupo.Size = new Size(210, 40);
+            btnGuardarGrupo.TabIndex = 16;
+            btnGuardarGrupo.Text = "Guardar grupo";
+            btnGuardarGrupo.UseVisualStyleBackColor = true;
+            btnGuardarGrupo.Click += btnGuardar_Click;
+            //
             // btnVolver
-            // 
-            btnVolver.Location = new Point(682, 413);
+            //
+            btnVolver.Location = new Point(888, 555);
             btnVolver.Name = "btnVolver";
-            btnVolver.Size = new Size(113, 32);
-            btnVolver.TabIndex = 8;
+            btnVolver.Size = new Size(110, 36);
+            btnVolver.TabIndex = 17;
             btnVolver.Text = "VOLVER";
             btnVolver.UseVisualStyleBackColor = true;
-            btnVolver.Click += button1_Click;
-            // 
-            // btnModificar
-            // 
-            btnModificar.Location = new Point(331, 222);
-            btnModificar.Name = "btnModificar";
-            btnModificar.Size = new Size(152, 39);
-            btnModificar.TabIndex = 9;
-            btnModificar.Text = "MODIFICAR";
-            btnModificar.UseVisualStyleBackColor = true;
-            btnModificar.Click += btnModificar_Click;
-            // 
-            // lblmodo
-            // 
-            lblmodo.AutoSize = true;
-            lblmodo.Location = new Point(4, 8);
-            lblmodo.Name = "lblmodo";
-            lblmodo.Size = new Size(76, 21);
-            lblmodo.TabIndex = 10;
-            lblmodo.Text = "MODO: ";
-            // 
-            // btnNuevo
-            // 
-            btnNuevo.Location = new Point(504, 42);
-            btnNuevo.Name = "btnNuevo";
-            btnNuevo.Size = new Size(168, 31);
-            btnNuevo.TabIndex = 11;
-            btnNuevo.Text = "NUEVO GRUPO";
-            btnNuevo.UseVisualStyleBackColor = true;
-            btnNuevo.Click += button1_Click_1;
-            // 
-            // btnEliminar
-            // 
-            btnEliminar.Location = new Point(329, 332);
-            btnEliminar.Name = "btnEliminar";
-            btnEliminar.Size = new Size(153, 38);
-            btnEliminar.TabIndex = 12;
-            btnEliminar.Text = "ELIMINAR";
-            btnEliminar.UseVisualStyleBackColor = true;
-            btnEliminar.Click += btnEliminar_Click;
-            // 
+            btnVolver.Click += btnVolver_Click;
+            //
             // FrmGruposPermisos
-            // 
+            //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Controls.Add(btnEliminar);
-            Controls.Add(btnNuevo);
-            Controls.Add(lblmodo);
-            Controls.Add(btnModificar);
+            ClientSize = new Size(1010, 600);
+            Controls.Add(lblTituloGrupos);
+            Controls.Add(lblEstadoGrupo);
+            Controls.Add(lblCodigo);
+            Controls.Add(txtCodigo);
+            Controls.Add(lblNombreGrupo);
+            Controls.Add(txtNombreGrupo);
+            Controls.Add(lblAyudaCodigo);
+            Controls.Add(grpDisponibles);
+            Controls.Add(btnAgregarAlGrupo);
+            Controls.Add(btnQuitarDelGrupo);
+            Controls.Add(grpContenidoGrupo);
+            Controls.Add(lblAyudaDisponibles);
+            Controls.Add(lblAyudaContenido);
+            Controls.Add(lblLeyendaPerfil);
+            Controls.Add(btnEditarGrupo);
+            Controls.Add(btnEliminarGrupo);
+            Controls.Add(btnNuevoGrupo);
+            Controls.Add(btnGuardarGrupo);
             Controls.Add(btnVolver);
-            Controls.Add(btnGuardar);
-            Controls.Add(btnQuitar);
-            Controls.Add(btnAgregar);
-            Controls.Add(groupBox2);
-            Controls.Add(groupBox1);
-            Controls.Add(label1);
-            Controls.Add(textBox1);
             Name = "FrmGruposPermisos";
             Text = "FrmGruposPermisos";
             Load += FrmGruposPermisos_Load;
-            groupBox1.ResumeLayout(false);
-            groupBox2.ResumeLayout(false);
+            grpDisponibles.ResumeLayout(false);
+            grpContenidoGrupo.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
 
         #endregion
 
-        private TextBox textBox1;
-        private Label label1;
-        private ListBox lstPermisosDisponibles;
-        private GroupBox groupBox1;
-        private GroupBox groupBox2;
-        private ListBox lstPermisosDelGrupo;
-        private Button btnAgregar;
-        private Button btnQuitar;
-        private Button btnGuardar;
+        private Label lblTituloGrupos;
+        private Label lblEstadoGrupo;
+        private Label lblCodigo;
+        private TextBox txtCodigo;
+        private Label lblNombreGrupo;
+        private TextBox txtNombreGrupo;
+        private Label lblAyudaCodigo;
+        private GroupBox grpDisponibles;
+        private TreeView treePermisosDisponibles;
+        private GroupBox grpContenidoGrupo;
+        private TreeView treePermisosDelGrupo;
+        private Button btnAgregarAlGrupo;
+        private Button btnQuitarDelGrupo;
+        private Label lblAyudaDisponibles;
+        private Label lblAyudaContenido;
+        private Label lblLeyendaPerfil;
+        private Button btnEditarGrupo;
+        private Button btnEliminarGrupo;
+        private Button btnNuevoGrupo;
+        private Button btnGuardarGrupo;
         private Button btnVolver;
-        private Button btnModificar;
-        private Label lblmodo;
-        private Button btnNuevo;
-        private Button btnEliminar;
     }
 }
