@@ -41,7 +41,7 @@ namespace Oasis_Sports
 
         private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll)
         {
-            if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text))
+            if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text) && LanguageManager.GetInstance().EsTraducible(c))
             {
                 bll.GuardarOActualizar(new Traduccion
                 {
@@ -158,7 +158,7 @@ namespace Oasis_Sports
         {
             foreach (Control c in controles)
             {
-                if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text))
+                if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text) && LanguageManager.GetInstance().EsTraducible(c))
                 {
                     bllTraduccion.GuardarOActualizar(new Traduccion
                     {

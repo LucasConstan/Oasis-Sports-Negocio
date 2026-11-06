@@ -14,6 +14,11 @@ namespace BLL
         DAL_Clase dalClase_348LC = new DAL_Clase();
         BLL_Profesor bllProfesor_348LC = new BLL_Profesor();
 
+        public const int CANTIDAD_CANCHAS = 5;
+        public const int DURACION_MINIMA_MINUTOS = 30;
+        public const int DURACION_MAXIMA_MINUTOS = 180;
+        public const int INTERVALO_DURACION_MINUTOS = 15;
+
         public void ValidarDatos_348LC(Clase clase_348LC)
         {
             if (string.IsNullOrWhiteSpace(clase_348LC.NombreClase))
@@ -24,8 +29,17 @@ namespace BLL
             clase_348LC.Fecha = clase_348LC.Fecha.Date;
             clase_348LC.HoraInicio = new TimeSpan(clase_348LC.HoraInicio.Hours, clase_348LC.HoraInicio.Minutes, 0);
 
+            if (clase_348LC.NombreClase.Length < 3)
+                throw new Exception("El nombre de la clase debe tener al menos 3 caracteres.");
+
             if (clase_348LC.NombreClase.Length > 50)
                 throw new Exception("El nombre de la clase no puede superar los 50 caracteres.");
+
+            if (!clase_348LC.NombreClase.Any(char.IsLetter))
+                throw new Exception("El nombre de la clase debe contener al menos una letra.");
+
+            if (!clase_348LC.NombreClase.All(c_348LC => char.IsLetterOrDigit(c_348LC) || " -.,'()".Contains(c_348LC)))
+                throw new Exception("El nombre de la clase solo puede contener letras, números, espacios y los signos - . , ' ( ).");
 
             if (clase_348LC.Descripcion.Length > 200)
                 throw new Exception("La descripción no puede superar los 200 caracteres.");
@@ -33,10 +47,19 @@ namespace BLL
             if (clase_348LC.Fecha < DateTime.Today)
                 throw new Exception("La fecha de la clase no puede ser anterior a hoy.");
 
-            if (clase_348LC.Duracion <= 0)
-                throw new Exception("La duración debe ser mayor a 0 minutos.");
+            if (clase_348LC.Fecha > DateTime.Today.AddYears(1))
+                throw new Exception("La clase no puede programarse con más de un año de anticipación.");
 
-            if (clase_348LC.HoraInicio.Add(TimeSpan.FromMinutes(clase_348LC.Duracion)) > TimeSpan.FromHours(24))
+            if (clase_348LC.Fecha + clase_348LC.HoraInicio <= DateTime.Now)
+                throw new Exception("No se puede crear una clase en un horario que ya pasó.");
+
+            if (clase_348LC.Duracion < DURACION_MINIMA_MINUTOS || clase_348LC.Duracion > DURACION_MAXIMA_MINUTOS)
+                throw new Exception($"La duración debe estar entre {DURACION_MINIMA_MINUTOS} y {DURACION_MAXIMA_MINUTOS} minutos.");
+
+            if (clase_348LC.Duracion % INTERVALO_DURACION_MINUTOS != 0)
+                throw new Exception($"La duración debe ser múltiplo de {INTERVALO_DURACION_MINUTOS} minutos.");
+
+            if (clase_348LC.HoraInicio.Add(TimeSpan.FromMinutes(clase_348LC.Duracion)) >= TimeSpan.FromHours(24))
                 throw new Exception("La clase debe terminar antes de la medianoche.");
 
             if (clase_348LC.CupoMaximo <= 0)
@@ -54,8 +77,19 @@ namespace BLL
             ValidarDatos_348LC(clase_348LC);
             Validar_348LC(clase_348LC);
 
+            if (dalClase_348LC.ExisteClaseDuplicada_348LC(clase_348LC))
+                throw new Exception("Ya existe una clase con ese nombre en la misma fecha y hora.");
+
             if (dalClase_348LC.ExisteSuperposicion_348LC(clase_348LC))
                 throw new Exception("El profesor o la cancha ya tienen otra clase en ese horario.");
+
+            TimeSpan finClase_348LC = clase_348LC.HoraInicio.Add(TimeSpan.FromMinutes(clase_348LC.Duracion));
+            bool canchaConPartido_348LC = new DAL_Partido().ListarPorFechaYCancha_348LC(clase_348LC.Fecha, clase_348LC.NumeroCancha).Any(p_348LC =>
+                p_348LC.HoraInicio < finClase_348LC &&
+                clase_348LC.HoraInicio < p_348LC.HoraInicio.Add(TimeSpan.FromMinutes(BLL_Partido.DURACION_PARTIDO_MINUTOS)));
+
+            if (canchaConPartido_348LC)
+                throw new Exception("La cancha tiene un partido de torneo programado en ese horario.");
 
             clase_348LC.Id = dalClase_348LC.AñadirClase_348LC(clase_348LC);
             RecalcularYGuardar_348LC(clase_348LC);
@@ -73,6 +107,9 @@ namespace BLL
             if (clase_348LC.NumeroCancha <= 0)
                 throw new Exception("Seleccioná una cancha.");
 
+            if (clase_348LC.NumeroCancha > CANTIDAD_CANCHAS)
+                throw new Exception($"La cancha seleccionada no existe. El predio tiene canchas del 1 al {CANTIDAD_CANCHAS}.");
+
             if (clase_348LC.CostoClase <= 0)
                 throw new Exception("El costo de la clase debe ser mayor a 0.");
 
@@ -81,6 +118,9 @@ namespace BLL
 
             clase_348LC.FechaInicioInscripcion = clase_348LC.FechaInicioInscripcion.Date;
             clase_348LC.FechaFinInscripcion = clase_348LC.FechaFinInscripcion.Date;
+
+            if (clase_348LC.FechaInicioInscripcion < DateTime.Today)
+                throw new Exception("El inicio de la inscripción no puede ser anterior a hoy.");
 
             if (clase_348LC.FechaInicioInscripcion > clase_348LC.FechaFinInscripcion)
                 throw new Exception("El inicio de la inscripción no puede ser posterior al fin.");

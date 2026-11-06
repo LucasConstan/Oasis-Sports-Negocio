@@ -37,6 +37,15 @@ namespace BLL
         public void Baja_348LC(int idParticipante_348LC)
         {
             ObtenerParticipanteActivo_348LC(idParticipante_348LC);
+
+            int clasesFuturas_348LC = new DAL_Matricula().ContarMatriculasFuturasPorParticipante_348LC(idParticipante_348LC);
+            if (clasesFuturas_348LC > 0)
+                throw new Exception($"No se puede eliminar el participante porque está inscripto en {clasesFuturas_348LC} clase(s) que todavía no se dictaron. Desinscribilo primero.");
+
+            int pagosPendientes_348LC = new DAL_Pago().ContarPendientesPorParticipante_348LC(idParticipante_348LC);
+            if (pagosPendientes_348LC > 0)
+                throw new Exception($"No se puede eliminar el participante porque tiene {pagosPendientes_348LC} pago(s) pendiente(s).");
+
             dalParticipante_348LC.EliminarParticipante_348LC(idParticipante_348LC);
             Participante participanteActualizado_348LC = dalParticipante_348LC.ObtenerPorId_348LC(idParticipante_348LC);
             RecalcularYGuardar_348LC(participanteActualizado_348LC);

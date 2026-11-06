@@ -53,7 +53,8 @@ namespace Oasis_Sports
         private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll, List<string> clavesExistentes)
         {
             if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
-                && !clavesExistentes.Contains(c.Name))
+                && !clavesExistentes.Contains(c.Name)
+                && LanguageManager.GetInstance().EsTraducible(c))
             {
                 bll.GuardarOActualizar(new Traduccion
                 {

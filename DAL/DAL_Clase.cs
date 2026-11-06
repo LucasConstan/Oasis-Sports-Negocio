@@ -38,6 +38,27 @@ namespace DAL
             }
         }
 
+        public bool ExisteClaseDuplicada_348LC(Clase clase_348LC)
+        {
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT COUNT(*) FROM Clases
+                         WHERE Fecha = @Fecha AND HoraInicio = @HoraInicio AND Eliminado = 0
+                         AND UPPER(LTRIM(RTRIM(NombreClase))) = UPPER(@NombreClase)";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@Fecha", clase_348LC.Fecha.Date);
+                    cmd_348LC.Parameters.AddWithValue("@HoraInicio", clase_348LC.HoraInicio);
+                    cmd_348LC.Parameters.AddWithValue("@NombreClase", clase_348LC.NombreClase.Trim());
+
+                    return (int)cmd_348LC.ExecuteScalar() > 0;
+                }
+            }
+        }
+
         public bool ExisteSuperposicion_348LC(Clase clase_348LC)
         {
             using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
@@ -64,6 +85,63 @@ namespace DAL
             }
         }
 
+        public List<Clase> ListarPorFechaYCancha_348LC(DateTime fecha_348LC, int numeroCancha_348LC)
+        {
+            List<Clase> lista_348LC = new List<Clase>();
+
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT Id_Clase, NombreClase, Fecha, HoraInicio, Duracion, NumeroCancha, Eliminado
+                         FROM Clases
+                         WHERE Fecha = @Fecha AND NumeroCancha = @NumeroCancha AND Eliminado = 0";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@Fecha", fecha_348LC.Date);
+                    cmd_348LC.Parameters.AddWithValue("@NumeroCancha", numeroCancha_348LC);
+
+                    using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())
+                    {
+                        while (reader_348LC.Read())
+                        {
+                            lista_348LC.Add(new Clase
+                            {
+                                Id = Convert.ToInt32(reader_348LC["Id_Clase"]),
+                                NombreClase = reader_348LC["NombreClase"].ToString(),
+                                Fecha = Convert.ToDateTime(reader_348LC["Fecha"]),
+                                HoraInicio = (TimeSpan)reader_348LC["HoraInicio"],
+                                Duracion = Convert.ToInt32(reader_348LC["Duracion"]),
+                                NumeroCancha = Convert.ToInt32(reader_348LC["NumeroCancha"]),
+                                Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"])
+                            });
+                        }
+                    }
+                }
+            }
+
+            return lista_348LC;
+        }
+
+        public int ContarClasesFuturasPorProfesor_348LC(int idProfesor_348LC)
+        {
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT COUNT(*) FROM Clases
+                         WHERE Id_Profesor = @Id_Profesor AND Eliminado = 0
+                         AND CAST(Fecha AS DATETIME) + CAST(HoraInicio AS DATETIME) > GETDATE()";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@Id_Profesor", idProfesor_348LC);
+                    return (int)cmd_348LC.ExecuteScalar();
+                }
+            }
+        }
+
         public List<Clase> ListarConInscripcionVigente_348LC()
         {
             List<Clase> lista_348LC = new List<Clase>();
@@ -77,8 +155,9 @@ namespace DAL
                          p.Nombre + ' ' + p.Apellido AS NombreProfesor
                          FROM Clases c
                          JOIN Profesores p ON p.Id_Profesor = c.Id_Profesor
-                         WHERE c.Eliminado = 0
-                         AND CAST(GETDATE() AS DATE) BETWEEN c.FechaInicioInscripcion AND c.FechaFinInscripcion";
+                         WHERE c.Eliminado = 0 AND p.Eliminado = 0
+                         AND CAST(GETDATE() AS DATE) BETWEEN c.FechaInicioInscripcion AND c.FechaFinInscripcion
+                         AND CAST(c.Fecha AS DATETIME) + CAST(c.HoraInicio AS DATETIME) > GETDATE()";
 
                 using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
                 using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())

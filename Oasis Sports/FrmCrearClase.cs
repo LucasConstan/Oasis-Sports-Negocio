@@ -27,14 +27,76 @@ namespace Oasis_Sports
         {
             RegistrarClaves();
             LanguageManager.GetInstance().TraducirControles(this);
+
+            nudDuracion.Minimum = BLL_Clase.DURACION_MINIMA_MINUTOS;
+            nudDuracion.Maximum = BLL_Clase.DURACION_MAXIMA_MINUTOS;
+            nudDuracion.Increment = BLL_Clase.INTERVALO_DURACION_MINUTOS;
+
+            cmbCancha.Items.Clear();
+            for (int cancha_348LC = 1; cancha_348LC <= BLL_Clase.CANTIDAD_CANCHAS; cancha_348LC++)
+                cmbCancha.Items.Add(cancha_348LC.ToString());
+
+            LimpiarCampos_348LC();
+
+            dtpFecha.ValueChanged += dtpFecha_ValueChanged;
+            dtpFecha.ValueChanged += DatosDisponibilidad_Changed;
+            dtpHoraInicio.ValueChanged += DatosDisponibilidad_Changed;
+            nudDuracion.ValueChanged += DatosDisponibilidad_Changed;
+        }
+
+        private void LimpiarCampos_348LC()
+        {
+            txtNombreClase.Clear();
+            txtDescripcion.Clear();
+
+            dtpFecha.MinDate = DateTime.Today;
+            dtpFecha.MaxDate = DateTime.Today.AddYears(1);
+            dtpFecha.Value = DateTime.Today;
+
+            DateTime proximaHora_348LC = DateTime.Today.AddHours(DateTime.Now.Hour + 1);
+            dtpHoraInicio.Value = proximaHora_348LC;
+
+            nudDuracion.Value = 60;
+            nudCupoMaximo.Value = 10;
+            nudCostoClase.Value = nudCostoClase.Minimum;
+            cmbCancha.SelectedIndex = -1;
+
+            dtpInicioInscripcion.MinDate = DateTime.Today;
+            dtpFinInscripcion.MinDate = DateTime.Today;
+            AjustarFechasInscripcion_348LC();
+            dtpInicioInscripcion.Value = DateTime.Today;
+
+            dgvProfesores.DataSource = null;
+        }
+
+        private void AjustarFechasInscripcion_348LC()
+        {
+            DateTime fechaClase_348LC = dtpFecha.Value.Date;
+
+            dtpInicioInscripcion.MaxDate = fechaClase_348LC;
+            dtpFinInscripcion.MaxDate = fechaClase_348LC;
+            dtpFinInscripcion.Value = fechaClase_348LC;
+        }
+
+        private void dtpFecha_ValueChanged(object sender, EventArgs e)
+        {
+            AjustarFechasInscripcion_348LC();
+        }
+
+        private void DatosDisponibilidad_Changed(object sender, EventArgs e)
+        {
+            dgvProfesores.DataSource = null;
         }
 
         public void ActualizarIdioma()
         {
             if (this.InvokeRequired)
-                this.Invoke(new Action(() => LanguageManager.GetInstance().TraducirControles(this)));
+                this.Invoke(new Action(ActualizarIdioma));
             else
+            {
                 LanguageManager.GetInstance().TraducirControles(this);
+                TitularColumnas_348LC();
+            }
         }
 
         private void RegistrarClaves()
@@ -50,7 +112,8 @@ namespace Oasis_Sports
         private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll, List<string> clavesExistentes)
         {
             if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
-                && !clavesExistentes.Contains(c.Name))
+                && !clavesExistentes.Contains(c.Name)
+                && LanguageManager.GetInstance().EsTraducible(c))
             {
                 bll.GuardarOActualizar(new Traduccion
                 {
@@ -71,6 +134,24 @@ namespace Oasis_Sports
             dgvProfesores.Columns["Eliminado"].Visible = false;
             dgvProfesores.Columns["DVH"].Visible = false;
             dgvProfesores.Columns["Id"].Visible = false;
+            TitularColumnas_348LC();
+        }
+
+        private void TitularColumnas_348LC()
+        {
+            if (dgvProfesores.DataSource == null)
+                return;
+
+            dgvProfesores.Columns["DNI"].HeaderText = Texto_348LC("colDNI", "DNI");
+            dgvProfesores.Columns["Nombre"].HeaderText = Texto_348LC("colNombre", "Nombre");
+            dgvProfesores.Columns["Apellido"].HeaderText = Texto_348LC("colApellido", "Apellido");
+            dgvProfesores.Columns["Especialidad"].HeaderText = Texto_348LC("colEspecialidad", "Especialidad");
+        }
+
+        private string Texto_348LC(string clave_348LC, string porDefecto_348LC)
+        {
+            string texto_348LC = LanguageManager.GetInstance().ObtenerTexto(clave_348LC);
+            return texto_348LC == clave_348LC ? porDefecto_348LC : texto_348LC;
         }
 
         private void btnBuscarDisponibilidad_Click(object sender, EventArgs e)
@@ -138,7 +219,7 @@ namespace Oasis_Sports
                     Criticidad = 3
                 });
 
-                dgvProfesores.DataSource = null;
+                LimpiarCampos_348LC();
                 MessageBox.Show("Clase creada correctamente.");
             }
             catch (Exception ex_348LC)

@@ -63,6 +63,7 @@ namespace Oasis_Sports
             //
             lblNombreClase.AutoSize = true;
             lblNombreClase.Location = new Point(20, 23);
+            lblNombreClase.ForeColor = Color.DarkGreen;
             lblNombreClase.Name = "lblNombreClase";
             lblNombreClase.Size = new Size(87, 21);
             lblNombreClase.TabIndex = 0;
@@ -80,6 +81,7 @@ namespace Oasis_Sports
             //
             lblDescripcion.AutoSize = true;
             lblDescripcion.Location = new Point(20, 63);
+            lblDescripcion.ForeColor = Color.DarkGreen;
             lblDescripcion.Name = "lblDescripcion";
             lblDescripcion.Size = new Size(131, 21);
             lblDescripcion.TabIndex = 2;
@@ -90,13 +92,16 @@ namespace Oasis_Sports
             txtDescripcion.Location = new Point(200, 60);
             txtDescripcion.MaxLength = 200;
             txtDescripcion.Name = "txtDescripcion";
-            txtDescripcion.Size = new Size(250, 29);
+            txtDescripcion.Multiline = true;
+            txtDescripcion.ScrollBars = ScrollBars.Vertical;
+            txtDescripcion.Size = new Size(250, 69);
             txtDescripcion.TabIndex = 3;
             //
             // lblFecha
             //
             lblFecha.AutoSize = true;
-            lblFecha.Location = new Point(20, 103);
+            lblFecha.Location = new Point(20, 143);
+            lblFecha.ForeColor = Color.DarkGreen;
             lblFecha.Name = "lblFecha";
             lblFecha.Size = new Size(71, 21);
             lblFecha.TabIndex = 4;
@@ -105,7 +110,7 @@ namespace Oasis_Sports
             // dtpFecha
             //
             dtpFecha.Format = DateTimePickerFormat.Short;
-            dtpFecha.Location = new Point(200, 100);
+            dtpFecha.Location = new Point(200, 140);
             dtpFecha.Name = "dtpFecha";
             dtpFecha.Size = new Size(250, 29);
             dtpFecha.TabIndex = 5;
@@ -113,7 +118,8 @@ namespace Oasis_Sports
             // lblHoraInicio
             //
             lblHoraInicio.AutoSize = true;
-            lblHoraInicio.Location = new Point(20, 143);
+            lblHoraInicio.Location = new Point(20, 183);
+            lblHoraInicio.ForeColor = Color.DarkGreen;
             lblHoraInicio.Name = "lblHoraInicio";
             lblHoraInicio.Size = new Size(141, 21);
             lblHoraInicio.TabIndex = 6;
@@ -123,7 +129,7 @@ namespace Oasis_Sports
             //
             dtpHoraInicio.CustomFormat = "HH:mm";
             dtpHoraInicio.Format = DateTimePickerFormat.Custom;
-            dtpHoraInicio.Location = new Point(200, 140);
+            dtpHoraInicio.Location = new Point(200, 180);
             dtpHoraInicio.Name = "dtpHoraInicio";
             dtpHoraInicio.ShowUpDown = true;
             dtpHoraInicio.Size = new Size(250, 29);
@@ -132,7 +138,8 @@ namespace Oasis_Sports
             // lblDuracion
             //
             lblDuracion.AutoSize = true;
-            lblDuracion.Location = new Point(20, 183);
+            lblDuracion.Location = new Point(20, 223);
+            lblDuracion.ForeColor = Color.DarkGreen;
             lblDuracion.Name = "lblDuracion";
             lblDuracion.Size = new Size(160, 21);
             lblDuracion.TabIndex = 8;
@@ -141,8 +148,9 @@ namespace Oasis_Sports
             // nudDuracion
             //
             nudDuracion.Increment = new decimal(new int[] { 15, 0, 0, 0 });
-            nudDuracion.Location = new Point(200, 180);
-            nudDuracion.Maximum = new decimal(new int[] { 600, 0, 0, 0 });
+            nudDuracion.Location = new Point(200, 220);
+            nudDuracion.Maximum = new decimal(new int[] { 180, 0, 0, 0 });
+            nudDuracion.Minimum = new decimal(new int[] { 30, 0, 0, 0 });
             nudDuracion.Name = "nudDuracion";
             nudDuracion.Size = new Size(250, 29);
             nudDuracion.TabIndex = 9;
@@ -151,7 +159,8 @@ namespace Oasis_Sports
             // lblCupoMaximo
             //
             lblCupoMaximo.AutoSize = true;
-            lblCupoMaximo.Location = new Point(20, 223);
+            lblCupoMaximo.Location = new Point(20, 263);
+            lblCupoMaximo.ForeColor = Color.DarkGreen;
             lblCupoMaximo.Name = "lblCupoMaximo";
             lblCupoMaximo.Size = new Size(143, 21);
             lblCupoMaximo.TabIndex = 10;
@@ -159,7 +168,7 @@ namespace Oasis_Sports
             //
             // nudCupoMaximo
             //
-            nudCupoMaximo.Location = new Point(200, 220);
+            nudCupoMaximo.Location = new Point(200, 260);
             nudCupoMaximo.Maximum = new decimal(new int[] { 200, 0, 0, 0 });
             nudCupoMaximo.Name = "nudCupoMaximo";
             nudCupoMaximo.Size = new Size(250, 29);
@@ -169,7 +178,8 @@ namespace Oasis_Sports
             // btnBuscarDisponibilidad
             //
             btnBuscarDisponibilidad.BackColor = Color.White;
-            btnBuscarDisponibilidad.Location = new Point(200, 265);
+            btnBuscarDisponibilidad.Location = new Point(200, 305);
+            btnBuscarDisponibilidad.ForeColor = Color.DarkGreen;
             btnBuscarDisponibilidad.Name = "btnBuscarDisponibilidad";
             btnBuscarDisponibilidad.Size = new Size(250, 42);
             btnBuscarDisponibilidad.TabIndex = 12;
@@ -181,6 +191,7 @@ namespace Oasis_Sports
             //
             lblCancha.AutoSize = true;
             lblCancha.Location = new Point(480, 23);
+            lblCancha.ForeColor = Color.DarkGreen;
             lblCancha.Name = "lblCancha";
             lblCancha.Size = new Size(88, 21);
             lblCancha.TabIndex = 13;
@@ -190,7 +201,6 @@ namespace Oasis_Sports
             //
             cmbCancha.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbCancha.FormattingEnabled = true;
-            cmbCancha.Items.AddRange(new object[] { "1", "2", "3", "4", "5" });
             cmbCancha.Location = new Point(700, 20);
             cmbCancha.Name = "cmbCancha";
             cmbCancha.Size = new Size(180, 29);
@@ -200,6 +210,7 @@ namespace Oasis_Sports
             //
             lblCostoClase.AutoSize = true;
             lblCostoClase.Location = new Point(480, 63);
+            lblCostoClase.ForeColor = Color.DarkGreen;
             lblCostoClase.Name = "lblCostoClase";
             lblCostoClase.Size = new Size(77, 21);
             lblCostoClase.TabIndex = 15;
@@ -211,6 +222,7 @@ namespace Oasis_Sports
             nudCostoClase.Increment = new decimal(new int[] { 100, 0, 0, 0 });
             nudCostoClase.Location = new Point(700, 60);
             nudCostoClase.Maximum = new decimal(new int[] { 99999999, 0, 0, 131072 });
+            nudCostoClase.ThousandsSeparator = true;
             nudCostoClase.Name = "nudCostoClase";
             nudCostoClase.Size = new Size(180, 29);
             nudCostoClase.TabIndex = 16;
@@ -220,6 +232,7 @@ namespace Oasis_Sports
             //
             lblInicioInscripcion.AutoSize = true;
             lblInicioInscripcion.Location = new Point(480, 103);
+            lblInicioInscripcion.ForeColor = Color.DarkGreen;
             lblInicioInscripcion.Name = "lblInicioInscripcion";
             lblInicioInscripcion.Size = new Size(201, 21);
             lblInicioInscripcion.TabIndex = 17;
@@ -237,6 +250,7 @@ namespace Oasis_Sports
             //
             lblFinInscripcion.AutoSize = true;
             lblFinInscripcion.Location = new Point(480, 143);
+            lblFinInscripcion.ForeColor = Color.DarkGreen;
             lblFinInscripcion.Name = "lblFinInscripcion";
             lblFinInscripcion.Size = new Size(178, 21);
             lblFinInscripcion.TabIndex = 19;
@@ -253,9 +267,10 @@ namespace Oasis_Sports
             // btnRegistrarClase
             //
             btnRegistrarClase.BackColor = Color.White;
-            btnRegistrarClase.Location = new Point(700, 265);
+            btnRegistrarClase.Location = new Point(480, 305);
+            btnRegistrarClase.ForeColor = Color.DarkGreen;
             btnRegistrarClase.Name = "btnRegistrarClase";
-            btnRegistrarClase.Size = new Size(180, 42);
+            btnRegistrarClase.Size = new Size(400, 42);
             btnRegistrarClase.TabIndex = 21;
             btnRegistrarClase.Text = "REGISTRAR CLASE";
             btnRegistrarClase.UseVisualStyleBackColor = false;
@@ -264,10 +279,11 @@ namespace Oasis_Sports
             // btnVolver
             //
             btnVolver.BackColor = Color.White;
-            btnVolver.Location = new Point(480, 265);
+            btnVolver.Location = new Point(20, 705);
+            btnVolver.ForeColor = Color.DarkGreen;
             btnVolver.Name = "btnVolver";
             btnVolver.Size = new Size(180, 42);
-            btnVolver.TabIndex = 22;
+            btnVolver.TabIndex = 25;
             btnVolver.Text = "VOLVER";
             btnVolver.UseVisualStyleBackColor = false;
             btnVolver.Click += btnVolver_Click;
@@ -275,7 +291,8 @@ namespace Oasis_Sports
             // lblProfesores
             //
             lblProfesores.AutoSize = true;
-            lblProfesores.Location = new Point(20, 325);
+            lblProfesores.Location = new Point(20, 365);
+            lblProfesores.ForeColor = Color.DarkGreen;
             lblProfesores.Name = "lblProfesores";
             lblProfesores.Size = new Size(260, 21);
             lblProfesores.TabIndex = 23;
@@ -287,8 +304,9 @@ namespace Oasis_Sports
             dgvProfesores.AllowUserToDeleteRows = false;
             dgvProfesores.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dgvProfesores.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvProfesores.Location = new Point(20, 355);
+            dgvProfesores.Location = new Point(20, 395);
             dgvProfesores.MultiSelect = false;
+            dgvProfesores.BackgroundColor = Color.White;
             dgvProfesores.Name = "dgvProfesores";
             dgvProfesores.ReadOnly = true;
             dgvProfesores.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -299,7 +317,7 @@ namespace Oasis_Sports
             //
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(900, 665);
+            ClientSize = new Size(900, 765);
             Controls.Add(dgvProfesores);
             Controls.Add(lblProfesores);
             Controls.Add(btnVolver);

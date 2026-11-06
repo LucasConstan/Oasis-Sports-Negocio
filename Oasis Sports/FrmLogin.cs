@@ -46,7 +46,8 @@ namespace Oasis_Sports
 
 
             if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
-                && !clavesExistentes.Contains(c.Name))
+                && !clavesExistentes.Contains(c.Name)
+                && LanguageManager.GetInstance().EsTraducible(c))
             {
                 bll.GuardarOActualizar(new Traduccion
                 {
@@ -221,8 +222,6 @@ namespace Oasis_Sports
         {
             textBox2.Text = "1234";
             textBox1.Text = "Lucas";
-
-            //Prueba7  Contra: lolo78
             LanguageManager.GetInstance().TraducirControles(this);
             RegistrarClaves();
         }

@@ -19,6 +19,7 @@ namespace DAL
                 cn_348LC.Open();
 
                 string query_348LC = @"SELECT pg.Id_Pago, pg.Id_Matricula, pg.Monto, pg.MedioPago, pg.FechaPago, pg.Estado, pg.Eliminado,
+                         pg.MarcaTarjeta, pg.UltimosDigitos, pg.BancoOrigen,
                          p.DNI, p.Nombre, p.Apellido, c.NombreClase
                          FROM Pagos pg
                          JOIN Matriculas m ON m.Id_Matricula = pg.Id_Matricula
@@ -41,6 +42,9 @@ namespace DAL
                             FechaPago = reader_348LC["FechaPago"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader_348LC["FechaPago"]),
                             Estado = reader_348LC["Estado"].ToString(),
                             Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"]),
+                            MarcaTarjeta = reader_348LC["MarcaTarjeta"] == DBNull.Value ? null : reader_348LC["MarcaTarjeta"].ToString(),
+                            UltimosDigitos = reader_348LC["UltimosDigitos"] == DBNull.Value ? null : reader_348LC["UltimosDigitos"].ToString(),
+                            BancoOrigen = reader_348LC["BancoOrigen"] == DBNull.Value ? null : reader_348LC["BancoOrigen"].ToString(),
                             DNI = reader_348LC["DNI"].ToString(),
                             Nombre = reader_348LC["Nombre"].ToString(),
                             Apellido = reader_348LC["Apellido"].ToString(),
@@ -61,7 +65,7 @@ namespace DAL
             {
                 cn_348LC.Open();
 
-                string query_348LC = @"SELECT Id_Pago, Id_Matricula, Monto, MedioPago, FechaPago, Estado, Eliminado
+                string query_348LC = @"SELECT Id_Pago, Id_Matricula, Monto, MedioPago, FechaPago, Estado, Eliminado, MarcaTarjeta, UltimosDigitos, BancoOrigen
                          FROM Pagos WHERE Id_Pago = @Id_Pago";
 
                 using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
@@ -80,7 +84,10 @@ namespace DAL
                                 MedioPago = reader_348LC["MedioPago"].ToString(),
                                 FechaPago = reader_348LC["FechaPago"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader_348LC["FechaPago"]),
                                 Estado = reader_348LC["Estado"].ToString(),
-                                Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"])
+                                Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"]),
+                                MarcaTarjeta = reader_348LC["MarcaTarjeta"] == DBNull.Value ? null : reader_348LC["MarcaTarjeta"].ToString(),
+                                UltimosDigitos = reader_348LC["UltimosDigitos"] == DBNull.Value ? null : reader_348LC["UltimosDigitos"].ToString(),
+                                BancoOrigen = reader_348LC["BancoOrigen"] == DBNull.Value ? null : reader_348LC["BancoOrigen"].ToString()
                             };
                         }
                     }
@@ -88,6 +95,46 @@ namespace DAL
             }
 
             return pago_348LC;
+        }
+
+        public int ContarPendientesPorParticipante_348LC(int idParticipante_348LC)
+        {
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT COUNT(*) FROM Pagos pg
+                         JOIN Matriculas m ON m.Id_Matricula = pg.Id_Matricula
+                         WHERE m.Id_Participante = @Id_Participante AND pg.Eliminado = 0 AND pg.Estado = @Estado";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@Id_Participante", idParticipante_348LC);
+                    cmd_348LC.Parameters.AddWithValue("@Estado", "Pendiente");
+                    return (int)cmd_348LC.ExecuteScalar();
+                }
+            }
+        }
+
+        public int ContarPendientesVencidosPorParticipante_348LC(int idParticipante_348LC)
+        {
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT COUNT(*) FROM Pagos pg
+                         JOIN Matriculas m ON m.Id_Matricula = pg.Id_Matricula
+                         JOIN Clases c ON c.Id_Clase = m.Id_Clase
+                         WHERE m.Id_Participante = @Id_Participante AND pg.Eliminado = 0 AND pg.Estado = @Estado
+                         AND CAST(c.Fecha AS DATETIME) + CAST(c.HoraInicio AS DATETIME) <= GETDATE()";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@Id_Participante", idParticipante_348LC);
+                    cmd_348LC.Parameters.AddWithValue("@Estado", "Pendiente");
+                    return (int)cmd_348LC.ExecuteScalar();
+                }
+            }
         }
 
         public int AñadirPago_348LC(Pago pago_348LC)
@@ -119,7 +166,10 @@ namespace DAL
             string query_348LC = @"UPDATE Pagos
                      SET MedioPago = @MedioPago,
                          FechaPago = @FechaPago,
-                         Estado = @Estado
+                         Estado = @Estado,
+                         MarcaTarjeta = @MarcaTarjeta,
+                         UltimosDigitos = @UltimosDigitos,
+                         BancoOrigen = @BancoOrigen
                      WHERE Id_Pago = @Id_Pago";
 
             using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
@@ -128,6 +178,9 @@ namespace DAL
                 cmd_348LC.Parameters.AddWithValue("@MedioPago", string.IsNullOrEmpty(pago_348LC.MedioPago) ? (object)DBNull.Value : pago_348LC.MedioPago);
                 cmd_348LC.Parameters.AddWithValue("@FechaPago", pago_348LC.FechaPago.HasValue ? (object)pago_348LC.FechaPago.Value.Date : DBNull.Value);
                 cmd_348LC.Parameters.AddWithValue("@Estado", pago_348LC.Estado);
+                cmd_348LC.Parameters.AddWithValue("@MarcaTarjeta", string.IsNullOrEmpty(pago_348LC.MarcaTarjeta) ? (object)DBNull.Value : pago_348LC.MarcaTarjeta);
+                cmd_348LC.Parameters.AddWithValue("@UltimosDigitos", string.IsNullOrEmpty(pago_348LC.UltimosDigitos) ? (object)DBNull.Value : pago_348LC.UltimosDigitos);
+                cmd_348LC.Parameters.AddWithValue("@BancoOrigen", string.IsNullOrEmpty(pago_348LC.BancoOrigen) ? (object)DBNull.Value : pago_348LC.BancoOrigen);
 
                 cmd_348LC.ExecuteNonQuery();
             }
@@ -140,7 +193,7 @@ namespace DAL
             SqlConnection cn_348LC = conexion_348LC.ObtenerConexion();
             cn_348LC.Open();
 
-            string query_348LC = "SELECT Id_Pago, Id_Matricula, Monto, MedioPago, FechaPago, Estado, Eliminado, DVH FROM Pagos";
+            string query_348LC = "SELECT Id_Pago, Id_Matricula, Monto, MedioPago, FechaPago, Estado, Eliminado, MarcaTarjeta, UltimosDigitos, BancoOrigen, DVH FROM Pagos";
             using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
             using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())
             {
@@ -155,6 +208,9 @@ namespace DAL
                         FechaPago = reader_348LC["FechaPago"] == DBNull.Value ? (DateTime?)null : Convert.ToDateTime(reader_348LC["FechaPago"]),
                         Estado = reader_348LC["Estado"].ToString(),
                         Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"]),
+                        MarcaTarjeta = reader_348LC["MarcaTarjeta"] == DBNull.Value ? null : reader_348LC["MarcaTarjeta"].ToString(),
+                        UltimosDigitos = reader_348LC["UltimosDigitos"] == DBNull.Value ? null : reader_348LC["UltimosDigitos"].ToString(),
+                        BancoOrigen = reader_348LC["BancoOrigen"] == DBNull.Value ? null : reader_348LC["BancoOrigen"].ToString(),
                         DVH = Convert.ToInt32(reader_348LC["DVH"])
                     });
                 }

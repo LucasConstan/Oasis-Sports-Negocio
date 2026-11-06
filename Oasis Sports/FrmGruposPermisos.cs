@@ -69,7 +69,8 @@ namespace Oasis_Sports
 
 
             if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
-                && !clavesExistentes.Contains(c.Name))
+                && !clavesExistentes.Contains(c.Name)
+                && LanguageManager.GetInstance().EsTraducible(c))
             {
                 bll.GuardarOActualizar(new Traduccion
                 {

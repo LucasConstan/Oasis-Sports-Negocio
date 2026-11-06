@@ -60,6 +60,49 @@ namespace DAL
             return lista_348LC;
         }
 
+        public List<Partido> ListarPorFechaYCancha_348LC(DateTime fechaPartido_348LC, int numeroCancha_348LC)
+        {
+            List<Partido> lista_348LC = new List<Partido>();
+
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT Id_Partido, Id_Torneo, Id_EquipoLocal, Id_EquipoVisitante, FechaPartido, HoraInicio,
+                         NumeroCancha, Suspendido, Eliminado
+                         FROM Partidos
+                         WHERE FechaPartido = @FechaPartido AND NumeroCancha = @NumeroCancha
+                         AND Suspendido = 0 AND Eliminado = 0";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@FechaPartido", fechaPartido_348LC.Date);
+                    cmd_348LC.Parameters.AddWithValue("@NumeroCancha", numeroCancha_348LC);
+
+                    using (SqlDataReader reader_348LC = cmd_348LC.ExecuteReader())
+                    {
+                        while (reader_348LC.Read())
+                        {
+                            lista_348LC.Add(new Partido
+                            {
+                                Id = Convert.ToInt32(reader_348LC["Id_Partido"]),
+                                IdTorneo = Convert.ToInt32(reader_348LC["Id_Torneo"]),
+                                IdEquipoLocal = Convert.ToInt32(reader_348LC["Id_EquipoLocal"]),
+                                IdEquipoVisitante = Convert.ToInt32(reader_348LC["Id_EquipoVisitante"]),
+                                FechaPartido = Convert.ToDateTime(reader_348LC["FechaPartido"]),
+                                HoraInicio = (TimeSpan)reader_348LC["HoraInicio"],
+                                NumeroCancha = Convert.ToInt32(reader_348LC["NumeroCancha"]),
+                                Suspendido = Convert.ToBoolean(reader_348LC["Suspendido"]),
+                                Eliminado = Convert.ToBoolean(reader_348LC["Eliminado"])
+                            });
+                        }
+                    }
+                }
+            }
+
+            return lista_348LC;
+        }
+
         public Partido ObtenerCanchaOcupada_348LC(DateTime fechaPartido_348LC, TimeSpan horaInicio_348LC, int numeroCancha_348LC, int idPartidoExcluir_348LC = 0)
         {
             Partido partido_348LC = null;

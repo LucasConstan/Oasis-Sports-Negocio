@@ -28,15 +28,36 @@ namespace Oasis_Sports
             RegistrarClaves();
             LanguageManager.GetInstance().TraducirControles(this);
 
+            cmbClase.Format += cmbClase_Format;
             CargarClases_348LC();
         }
 
         public void ActualizarIdioma()
         {
             if (this.InvokeRequired)
-                this.Invoke(new Action(() => LanguageManager.GetInstance().TraducirControles(this)));
+                this.Invoke(new Action(ActualizarIdioma));
             else
+            {
                 LanguageManager.GetInstance().TraducirControles(this);
+
+                if (cmbClase.SelectedItem is Clase clase_348LC)
+                {
+                    CargarParticipantes_348LC(clase_348LC);
+                    CargarMatriculados_348LC(clase_348LC);
+                }
+            }
+        }
+
+        private string Texto_348LC(string clave_348LC, string porDefecto_348LC)
+        {
+            string texto_348LC = LanguageManager.GetInstance().ObtenerTexto(clave_348LC);
+            return texto_348LC == clave_348LC ? porDefecto_348LC : texto_348LC;
+        }
+
+        private void cmbClase_Format(object sender, ListControlConvertEventArgs e)
+        {
+            if (e.ListItem is Clase clase_348LC)
+                e.Value = $"{clase_348LC.NombreClase} – {clase_348LC.Fecha:dd/MM} {clase_348LC.HoraInicio:hh\\:mm}";
         }
 
         private void RegistrarClaves()
@@ -52,7 +73,8 @@ namespace Oasis_Sports
         private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll, List<string> clavesExistentes)
         {
             if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
-                && !clavesExistentes.Contains(c.Name))
+                && !clavesExistentes.Contains(c.Name)
+                && LanguageManager.GetInstance().EsTraducible(c))
             {
                 bll.GuardarOActualizar(new Traduccion
                 {
@@ -75,14 +97,13 @@ namespace Oasis_Sports
             cmbClase.ValueMember = "Id";
             cmbClase.DataSource = clases_348LC;
 
-            btnInscribir.Enabled = clases_348LC.Count > 0;
-
             if (clases_348LC.Count == 0)
             {
+                btnInscribir.Enabled = false;
                 lblDatosClase.Text = "";
                 dgvParticipantes.DataSource = null;
                 dgvMatriculados.DataSource = null;
-                MessageBox.Show("No hay clases disponibles con inscripción abierta.");
+                lblDatosClase.Text = Texto_348LC("msgSinClasesAbiertas", "No hay clases disponibles con inscripción abierta.");
             }
         }
 
@@ -92,6 +113,12 @@ namespace Oasis_Sports
             dgvParticipantes.Columns["Id"].Visible = false;
             dgvParticipantes.Columns["Eliminado"].Visible = false;
             dgvParticipantes.Columns["DVH"].Visible = false;
+            dgvParticipantes.Columns["DNI"].HeaderText = Texto_348LC("colDNI", "DNI");
+            dgvParticipantes.Columns["Nombre"].HeaderText = Texto_348LC("colNombre", "Nombre");
+            dgvParticipantes.Columns["Apellido"].HeaderText = Texto_348LC("colApellido", "Apellido");
+            dgvParticipantes.Columns["Edad"].HeaderText = Texto_348LC("colEdad", "Edad");
+            dgvParticipantes.Columns["Telefono"].HeaderText = Texto_348LC("colTelefono", "Teléfono");
+            dgvParticipantes.Columns["Direccion"].HeaderText = Texto_348LC("colDireccion", "Dirección");
         }
 
         private void CargarMatriculados_348LC(Clase clase_348LC)
@@ -107,10 +134,29 @@ namespace Oasis_Sports
             dgvMatriculados.Columns["NombreClase"].Visible = false;
             dgvMatriculados.Columns["CostoClase"].Visible = false;
 
-            lblDatosClase.Text = $"Profesor: {clase_348LC.NombreProfesor}   Cancha: {clase_348LC.NumeroCancha}   " +
-                $"Fecha: {clase_348LC.Fecha:dd/MM/yyyy} {clase_348LC.HoraInicio:hh\\:mm} ({clase_348LC.Duracion} min)\n" +
-                $"Costo: ${clase_348LC.CostoClase:N2}   Inscriptos: {matriculados_348LC.Count}/{clase_348LC.CupoMaximo}   " +
-                $"Inscripción: {clase_348LC.FechaInicioInscripcion:dd/MM/yyyy} al {clase_348LC.FechaFinInscripcion:dd/MM/yyyy}";
+            dgvMatriculados.Columns["DNI"].DisplayIndex = 0;
+            dgvMatriculados.Columns["Nombre"].DisplayIndex = 1;
+            dgvMatriculados.Columns["Apellido"].DisplayIndex = 2;
+            dgvMatriculados.Columns["FechaMatricula"].DisplayIndex = 3;
+
+            dgvMatriculados.Columns["DNI"].HeaderText = Texto_348LC("colDNI", "DNI");
+            dgvMatriculados.Columns["Nombre"].HeaderText = Texto_348LC("colNombre", "Nombre");
+            dgvMatriculados.Columns["Apellido"].HeaderText = Texto_348LC("colApellido", "Apellido");
+            dgvMatriculados.Columns["FechaMatricula"].HeaderText = Texto_348LC("colFechaInscripcion", "Fecha de inscripción");
+            dgvMatriculados.Columns["FechaMatricula"].DefaultCellStyle.Format = "dd/MM/yyyy";
+
+            lblDatosClase.Text = $"{Texto_348LC("msgProfesor", "Profesor")}: {clase_348LC.NombreProfesor}   " +
+                $"{Texto_348LC("msgCancha", "Cancha")}: {clase_348LC.NumeroCancha}   " +
+                $"{Texto_348LC("msgFecha", "Fecha")}: {clase_348LC.Fecha:dd/MM/yyyy} {clase_348LC.HoraInicio:hh\\:mm} ({clase_348LC.Duracion} min)\n" +
+                $"{Texto_348LC("msgCosto", "Costo")}: ${clase_348LC.CostoClase:N2}   " +
+                $"{Texto_348LC("msgInscriptos", "Inscriptos")}: {matriculados_348LC.Count}/{clase_348LC.CupoMaximo}   " +
+                $"{Texto_348LC("msgInscripcion", "Inscripción")}: {clase_348LC.FechaInicioInscripcion:dd/MM/yyyy} {Texto_348LC("msgAl", "al")} {clase_348LC.FechaFinInscripcion:dd/MM/yyyy}";
+
+            bool cupoCompleto_348LC = matriculados_348LC.Count >= clase_348LC.CupoMaximo;
+            btnInscribir.Enabled = !cupoCompleto_348LC;
+
+            if (cupoCompleto_348LC)
+                lblDatosClase.Text += "   " + Texto_348LC("msgCupoCompleto", "CUPO COMPLETO");
         }
 
         private void cmbClase_SelectedIndexChanged(object sender, EventArgs e)
@@ -201,7 +247,7 @@ namespace Oasis_Sports
 
             try
             {
-                bllMatricula_348LC.Desinscribir_348LC(matricula_348LC.Id);
+                bllMatricula_348LC.Desinscribir_348LC(matricula_348LC.Id, clase_348LC.Id);
 
                 BLL_Evento bllEvento = new BLL_Evento();
                 bllEvento.RegistrarEvento(new Evento()

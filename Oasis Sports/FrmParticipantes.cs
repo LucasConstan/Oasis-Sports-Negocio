@@ -55,7 +55,8 @@ namespace Oasis_Sports
         private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll, List<string> clavesExistentes)
         {
             if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
-                && !clavesExistentes.Contains(c.Name))
+                && !clavesExistentes.Contains(c.Name)
+                && LanguageManager.GetInstance().EsTraducible(c))
             {
                 bll.GuardarOActualizar(new Traduccion
                 {
@@ -243,6 +244,9 @@ namespace Oasis_Sports
                 dgvParticipantes.Columns["DVH"].Visible = false;
                 dgvParticipantes.Columns["Id"].Visible = false;
                 txtRutaDesSerializar.Text = dialogo_348LC.FileName;
+                btnAñadir.Enabled = false;
+                btnModificar.Enabled = false;
+                btnEliminar.Enabled = false;
                 MessageBox.Show("Participantes des-serializados correctamente.");
             }
             catch (InvalidOperationException)
@@ -258,6 +262,11 @@ namespace Oasis_Sports
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             dgvParticipantes.DataSource = null;
+            idSeleccionado_348LC = 0;
+            CargarGrilla_348LC();
+            btnAñadir.Enabled = true;
+            btnModificar.Enabled = true;
+            btnEliminar.Enabled = true;
         }
     }
 }

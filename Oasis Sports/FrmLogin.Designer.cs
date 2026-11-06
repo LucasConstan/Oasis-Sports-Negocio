@@ -33,7 +33,7 @@
             btnIniciarSesion = new Button();
             lblUsuario = new Label();
             lblContraseña = new Label();
-            lblAlquilerCanchas = new Label();
+            lblTituloLogin = new Label();
             btnVolver = new Button();
             pictureBox1 = new PictureBox();
             btnIdiomaInicio = new Button();
@@ -90,19 +90,19 @@
             lblContraseña.TabIndex = 4;
             lblContraseña.Text = "CONTRASEÑA";
             // 
-            // lblAlquilerCanchas
+            // lblTituloLogin
             // 
-            lblAlquilerCanchas.AutoSize = true;
-            lblAlquilerCanchas.BackColor = Color.Transparent;
-            lblAlquilerCanchas.Font = new Font("Times New Roman", 30F, FontStyle.Italic, GraphicsUnit.Point, 0);
-            lblAlquilerCanchas.ForeColor = Color.Green;
-            lblAlquilerCanchas.Location = new Point(61, 28);
-            lblAlquilerCanchas.Name = "lblAlquilerCanchas";
-            lblAlquilerCanchas.Size = new Size(493, 47);
-            lblAlquilerCanchas.TabIndex = 5;
-            lblAlquilerCanchas.Text = "Alquiler de canchas de fútbol";
-            lblAlquilerCanchas.TextAlign = ContentAlignment.TopCenter;
-            lblAlquilerCanchas.Click += label3_Click;
+            lblTituloLogin.AutoSize = true;
+            lblTituloLogin.BackColor = Color.Transparent;
+            lblTituloLogin.Font = new Font("Times New Roman", 30F, FontStyle.Italic, GraphicsUnit.Point, 0);
+            lblTituloLogin.ForeColor = Color.Green;
+            lblTituloLogin.Location = new Point(61, 28);
+            lblTituloLogin.Name = "lblTituloLogin";
+            lblTituloLogin.Size = new Size(493, 47);
+            lblTituloLogin.TabIndex = 5;
+            lblTituloLogin.Text = "Complejo deportivo de fútbol";
+            lblTituloLogin.TextAlign = ContentAlignment.TopCenter;
+            lblTituloLogin.Click += label3_Click;
             // 
             // btnVolver
             // 
@@ -147,7 +147,7 @@
             ClientSize = new Size(630, 353);
             Controls.Add(btnIdiomaInicio);
             Controls.Add(btnVolver);
-            Controls.Add(lblAlquilerCanchas);
+            Controls.Add(lblTituloLogin);
             Controls.Add(lblContraseña);
             Controls.Add(lblUsuario);
             Controls.Add(btnIniciarSesion);
@@ -172,7 +172,7 @@
         private Button btnIniciarSesion;
         private Label lblUsuario;
         private Label lblContraseña;
-        private Label lblAlquilerCanchas;
+        private Label lblTituloLogin;
         private Button btnVolver;
         private PictureBox pictureBox1;
         private Button btnIdiomaInicio;

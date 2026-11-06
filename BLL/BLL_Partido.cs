@@ -14,6 +14,8 @@ namespace BLL
         DAL_Partido dalPartido_348LC = new DAL_Partido();
         DAL_Inscripcion dalInscripcion_348LC = new DAL_Inscripcion();
 
+        public const int DURACION_PARTIDO_MINUTOS = 90;
+
         public List<Partido> ListarPorTorneo_348LC(int idTorneo_348LC)
         {
             return dalPartido_348LC.ListarPorTorneo_348LC(idTorneo_348LC);
@@ -63,6 +65,14 @@ namespace BLL
 
             if (dalPartido_348LC.ObtenerCanchaOcupada_348LC(partido_348LC.FechaPartido, partido_348LC.HoraInicio, partido_348LC.NumeroCancha, idPartidoExcluir_348LC) != null)
                 throw new Exception("La cancha ya está asignada a otro partido en ese horario.");
+
+            TimeSpan finPartido_348LC = partido_348LC.HoraInicio.Add(TimeSpan.FromMinutes(DURACION_PARTIDO_MINUTOS));
+            bool canchaConClase_348LC = new DAL_Clase().ListarPorFechaYCancha_348LC(partido_348LC.FechaPartido, partido_348LC.NumeroCancha).Any(c_348LC =>
+                c_348LC.HoraInicio < finPartido_348LC &&
+                partido_348LC.HoraInicio < c_348LC.HoraInicio.Add(TimeSpan.FromMinutes(c_348LC.Duracion)));
+
+            if (canchaConClase_348LC)
+                throw new Exception("La cancha tiene una clase programada en ese horario.");
 
             bool equipoOcupado_348LC = dalPartido_348LC.ListarPorFechaHora_348LC(partido_348LC.FechaPartido, partido_348LC.HoraInicio, idPartidoExcluir_348LC).Any(p_348LC =>
                 p_348LC.IdEquipoLocal == partido_348LC.IdEquipoLocal || p_348LC.IdEquipoVisitante == partido_348LC.IdEquipoLocal ||

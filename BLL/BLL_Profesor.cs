@@ -37,6 +37,11 @@ namespace BLL
         public void Baja_348LC(int idProfesor_348LC)
         {
             ObtenerProfesorActivo_348LC(idProfesor_348LC);
+
+            int clasesFuturas_348LC = new DAL_Clase().ContarClasesFuturasPorProfesor_348LC(idProfesor_348LC);
+            if (clasesFuturas_348LC > 0)
+                throw new Exception($"No se puede eliminar el profesor porque tiene {clasesFuturas_348LC} clase(s) programada(s).");
+
             dalProfesor_348LC.EliminarProfesor_348LC(idProfesor_348LC);
             Profesor profesorActualizado_348LC = dalProfesor_348LC.ObtenerPorId_348LC(idProfesor_348LC);
             RecalcularYGuardar_348LC(profesorActualizado_348LC);

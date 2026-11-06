@@ -99,6 +99,51 @@ namespace DAL
             }
         }
 
+        public bool ExisteSuperposicionParticipante_348LC(int idParticipante_348LC, Clase clase_348LC)
+        {
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT COUNT(*) FROM Matriculas m
+                         JOIN Clases c ON c.Id_Clase = m.Id_Clase
+                         WHERE m.Id_Participante = @Id_Participante AND m.Eliminado = 0 AND c.Eliminado = 0
+                         AND c.Id_Clase <> @Id_Clase
+                         AND c.Fecha = @Fecha
+                         AND c.HoraInicio < DATEADD(MINUTE, @Duracion, @HoraInicio)
+                         AND @HoraInicio < DATEADD(MINUTE, c.Duracion, c.HoraInicio)";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@Id_Participante", idParticipante_348LC);
+                    cmd_348LC.Parameters.AddWithValue("@Id_Clase", clase_348LC.Id);
+                    cmd_348LC.Parameters.AddWithValue("@Fecha", clase_348LC.Fecha.Date);
+                    cmd_348LC.Parameters.AddWithValue("@HoraInicio", clase_348LC.HoraInicio);
+                    cmd_348LC.Parameters.AddWithValue("@Duracion", clase_348LC.Duracion);
+                    return (int)cmd_348LC.ExecuteScalar() > 0;
+                }
+            }
+        }
+
+        public int ContarMatriculasFuturasPorParticipante_348LC(int idParticipante_348LC)
+        {
+            using (SqlConnection cn_348LC = new Conexion().ObtenerConexion())
+            {
+                cn_348LC.Open();
+
+                string query_348LC = @"SELECT COUNT(*) FROM Matriculas m
+                         JOIN Clases c ON c.Id_Clase = m.Id_Clase
+                         WHERE m.Id_Participante = @Id_Participante AND m.Eliminado = 0 AND c.Eliminado = 0
+                         AND CAST(c.Fecha AS DATETIME) + CAST(c.HoraInicio AS DATETIME) > GETDATE()";
+
+                using (SqlCommand cmd_348LC = new SqlCommand(query_348LC, cn_348LC))
+                {
+                    cmd_348LC.Parameters.AddWithValue("@Id_Participante", idParticipante_348LC);
+                    return (int)cmd_348LC.ExecuteScalar();
+                }
+            }
+        }
+
         public int AñadirMatricula_348LC(Matricula matricula_348LC)
         {
             Conexion conexion_348LC = new Conexion();

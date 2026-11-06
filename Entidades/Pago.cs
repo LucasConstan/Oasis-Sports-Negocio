@@ -14,6 +14,9 @@ namespace Entidades
         public string MedioPago { get; set; }
         public DateTime? FechaPago { get; set; }
         public string Estado { get; set; }
+        public string MarcaTarjeta { get; set; }
+        public string UltimosDigitos { get; set; }
+        public string BancoOrigen { get; set; }
         public bool Eliminado { get; set; }
         public int DVH { get; set; }
         public string DNI { get; set; }
@@ -33,6 +36,9 @@ namespace Entidades
                 (MedioPago ?? "").Sum(c => (int)c),
                 FechaPago?.DayOfYear ?? 0,
                 (Estado ?? "").Sum(c => (int)c),
+                (MarcaTarjeta ?? "").Sum(c => (int)c),
+                (UltimosDigitos ?? "").Sum(c => (int)c),
+                (BancoOrigen ?? "").Sum(c => (int)c),
                 Eliminado ? 1 : 0
             };
         }

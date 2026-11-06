@@ -67,12 +67,21 @@ namespace Servicios
             TraducirRecursivo(formulario.Controls);
         }
 
+        public bool EsTraducible(System.Windows.Forms.Control c)
+        {
+            return !(c is System.Windows.Forms.TextBoxBase
+                || c is System.Windows.Forms.UpDownBase
+                || c is System.Windows.Forms.DateTimePicker
+                || c is System.Windows.Forms.ListControl
+                || c is System.Windows.Forms.DataGridView);
+        }
+
         private void TraducirRecursivo(System.Windows.Forms.Control.ControlCollection controles)
         {
             foreach (System.Windows.Forms.Control c in controles)
             {
                 string texto = ObtenerTexto(c.Name);
-                if (texto != c.Name)
+                if (texto != c.Name && EsTraducible(c))
                     c.Text = texto;
 
                 if (c.Controls.Count > 0)

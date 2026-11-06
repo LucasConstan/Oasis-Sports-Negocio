@@ -47,6 +47,7 @@ namespace Oasis_Sports
             //
             lblClase.AutoSize = true;
             lblClase.Location = new Point(20, 23);
+            lblClase.ForeColor = Color.DarkGreen;
             lblClase.Name = "lblClase";
             lblClase.Size = new Size(68, 21);
             lblClase.TabIndex = 0;
@@ -65,6 +66,7 @@ namespace Oasis_Sports
             // lblDatosClase
             //
             lblDatosClase.Location = new Point(20, 60);
+            lblDatosClase.ForeColor = Color.DarkGreen;
             lblDatosClase.Name = "lblDatosClase";
             lblDatosClase.Size = new Size(860, 60);
             lblDatosClase.TabIndex = 2;
@@ -73,6 +75,7 @@ namespace Oasis_Sports
             //
             lblParticipantes.AutoSize = true;
             lblParticipantes.Location = new Point(20, 130);
+            lblParticipantes.ForeColor = Color.DarkGreen;
             lblParticipantes.Name = "lblParticipantes";
             lblParticipantes.Size = new Size(290, 21);
             lblParticipantes.TabIndex = 3;
@@ -86,6 +89,7 @@ namespace Oasis_Sports
             dgvParticipantes.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvParticipantes.Location = new Point(20, 160);
             dgvParticipantes.MultiSelect = false;
+            dgvParticipantes.BackgroundColor = Color.White;
             dgvParticipantes.Name = "dgvParticipantes";
             dgvParticipantes.ReadOnly = true;
             dgvParticipantes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -96,6 +100,7 @@ namespace Oasis_Sports
             //
             btnInscribir.BackColor = Color.White;
             btnInscribir.Location = new Point(20, 375);
+            btnInscribir.ForeColor = Color.DarkGreen;
             btnInscribir.Name = "btnInscribir";
             btnInscribir.Size = new Size(180, 42);
             btnInscribir.TabIndex = 5;
@@ -107,9 +112,10 @@ namespace Oasis_Sports
             //
             btnDesinscribir.BackColor = Color.White;
             btnDesinscribir.Location = new Point(210, 375);
+            btnDesinscribir.ForeColor = Color.DarkGreen;
             btnDesinscribir.Name = "btnDesinscribir";
             btnDesinscribir.Size = new Size(180, 42);
-            btnDesinscribir.TabIndex = 10;
+            btnDesinscribir.TabIndex = 6;
             btnDesinscribir.Text = "DESINSCRIBIR";
             btnDesinscribir.UseVisualStyleBackColor = false;
             btnDesinscribir.Click += btnDesinscribir_Click;
@@ -118,9 +124,10 @@ namespace Oasis_Sports
             //
             btnRegistrarParticipante.BackColor = Color.White;
             btnRegistrarParticipante.Location = new Point(400, 375);
+            btnRegistrarParticipante.ForeColor = Color.DarkGreen;
             btnRegistrarParticipante.Name = "btnRegistrarParticipante";
             btnRegistrarParticipante.Size = new Size(280, 42);
-            btnRegistrarParticipante.TabIndex = 6;
+            btnRegistrarParticipante.TabIndex = 7;
             btnRegistrarParticipante.Text = "REGISTRAR PARTICIPANTE";
             btnRegistrarParticipante.UseVisualStyleBackColor = false;
             btnRegistrarParticipante.Click += btnRegistrarParticipante_Click;
@@ -129,9 +136,10 @@ namespace Oasis_Sports
             //
             btnVolver.BackColor = Color.White;
             btnVolver.Location = new Point(700, 375);
+            btnVolver.ForeColor = Color.DarkGreen;
             btnVolver.Name = "btnVolver";
             btnVolver.Size = new Size(180, 42);
-            btnVolver.TabIndex = 7;
+            btnVolver.TabIndex = 8;
             btnVolver.Text = "VOLVER";
             btnVolver.UseVisualStyleBackColor = false;
             btnVolver.Click += btnVolver_Click;
@@ -140,9 +148,10 @@ namespace Oasis_Sports
             //
             lblMatriculados.AutoSize = true;
             lblMatriculados.Location = new Point(20, 435);
+            lblMatriculados.ForeColor = Color.DarkGreen;
             lblMatriculados.Name = "lblMatriculados";
             lblMatriculados.Size = new Size(140, 21);
-            lblMatriculados.TabIndex = 8;
+            lblMatriculados.TabIndex = 9;
             lblMatriculados.Text = "INSCRIPTOS";
             //
             // dgvMatriculados
@@ -153,11 +162,12 @@ namespace Oasis_Sports
             dgvMatriculados.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvMatriculados.Location = new Point(20, 465);
             dgvMatriculados.MultiSelect = false;
+            dgvMatriculados.BackgroundColor = Color.White;
             dgvMatriculados.Name = "dgvMatriculados";
             dgvMatriculados.ReadOnly = true;
             dgvMatriculados.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvMatriculados.Size = new Size(860, 200);
-            dgvMatriculados.TabIndex = 9;
+            dgvMatriculados.TabIndex = 10;
             //
             // FrmInscribirParticipante
             //

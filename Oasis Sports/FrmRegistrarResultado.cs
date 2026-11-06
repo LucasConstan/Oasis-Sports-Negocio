@@ -58,7 +58,8 @@ namespace Oasis_Sports
         private void RegistrarRecursivo(Control c, int idIdioma, BLL_Traduccion bll, List<string> clavesExistentes)
         {
             if (!string.IsNullOrWhiteSpace(c.Name) && !string.IsNullOrWhiteSpace(c.Text)
-                && !clavesExistentes.Contains(c.Name))
+                && !clavesExistentes.Contains(c.Name)
+                && LanguageManager.GetInstance().EsTraducible(c))
             {
                 bll.GuardarOActualizar(new Traduccion
                 {
@@ -132,7 +133,7 @@ namespace Oasis_Sports
 
                 using (SaveFileDialog guardar_348LC = new SaveFileDialog())
                 {
-                    string carpeta_348LC = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Reportes");
+                    string carpeta_348LC = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Oasis Sports", "Reportes");
                     Directory.CreateDirectory(carpeta_348LC);
 
                     guardar_348LC.Title = "Guardar reporte del torneo";
